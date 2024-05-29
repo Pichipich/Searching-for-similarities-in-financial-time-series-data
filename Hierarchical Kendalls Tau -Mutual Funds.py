@@ -275,7 +275,6 @@ def compute_temporal_ari(cluster_labels_matrix):
     num_windows = cluster_labels_matrix.shape[1]
     ari_scores = []
 
-    # Ensure the loop starts from the first interval and includes the last
     for i in range(num_windows - 1):  # This will correctly handle up to the last interval
         current_labels = cluster_labels_matrix[:, i]
         next_labels = cluster_labels_matrix[:, i + 1]
@@ -421,9 +420,7 @@ plt.tight_layout()
 plt.savefig("plots.png", dpi=300)  # High-resolution save for better quality in documents
 plt.show()
 
-
-
-
+#Save the clusters in df
 clusters_df = pd.DataFrame({'Symbol': symbols, 'Cluster': clusters})
 reduced_data_with_clusters_dms['Cluster'] = clusters
 
@@ -457,11 +454,6 @@ plt.show()
 
 
 
-
-
-
-
-
 end_time = time.time()
 elapsed_time = end_time - start_time
 print(f"Elapsed Time: {elapsed_time} seconds")
@@ -474,7 +466,7 @@ for cluster_num in sorted(clusters_df['Cluster'].unique()):
 
 
 
-#OUTLIERS
+#Outlier exclusion
 
 min_cluster_size = 2
 cluster_sizes = clusters_df['Cluster'].value_counts()
@@ -508,7 +500,7 @@ for cluster_num in sorted(clusters_df['Cluster'].unique()):
     print(f"Cluster {cluster_num}: {', '.join(cluster_stocks)}")
 
 
-
+#identify stocks in clusters being in the same sector
 company_mapping = {
 
     "ZGFIX": "Ninety One",   "FDVLX": "Fidelity",  "GNSRX": "abrdn",  "FSLBX": "Fidelity",  "CRIMX": "CRM",  "NWKCX": "Nationwide",   "NWHZX": "Nationwide",
@@ -629,39 +621,11 @@ plt.tight_layout()
 plt.show()
 
 
-
-
-
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-# Set the size of the figure larger to allow for better visibility of annotations
-plt.figure(figsize=(16, 10))
-
-# Create the heatmap with adjusted settings
-heatmap = sns.heatmap(cluster_sector_percentages, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5, annot_kws={"size": 12})
-
-# Set the title with increased font size and additional padding for aesthetics
-plt.title('Hierarchical Clustering with Kendall\'s Tau', fontsize=24, pad=20, weight='bold')
-
-# Set labels for axes with increased font size and weight
-plt.xlabel('Company', fontsize=20, weight='bold')
-plt.ylabel('Cluster', fontsize=20, weight='bold')
-
-# Adjust tick parameters for x and y axes for better readability and alignment
-plt.xticks(rotation=45, fontsize=12, ha='right', weight='bold')  # Decreased font size to 12 for x-axis labels
-plt.yticks(rotation=0, fontsize=16, weight='bold')
-
-# Use tight layout to ensure all parts of the figure are within the canvas
-plt.tight_layout()
-
-# Show the plot
-plt.show()
-
-
 filtered_symbols = [symbol for symbol in symbols if symbol not in outlier_stocks]
 filtered_clusters_df = clusters_df[clusters_df['Symbol'].isin(filtered_symbols)].copy()
 
+
+#intra cluster metrics
 
 for symbol, df in dfs.items():
     df['Return'] = df['Adj Close'].pct_change()
