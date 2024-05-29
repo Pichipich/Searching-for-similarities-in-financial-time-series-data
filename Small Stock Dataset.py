@@ -51,7 +51,7 @@ conn.close()
 
 
 
-
+#Sector Mapping
 sector_mapping = {
     "AMAT": "Technology", "JPM": "Finance", "NVDA": "Technology", "HD": "Consumer Discretionary",
     "INTC": "Technology", "QCOM": "Technology", "HON": "Industrials", "WFC": "Finance",
