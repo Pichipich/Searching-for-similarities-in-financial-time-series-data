@@ -283,18 +283,16 @@ def compute_temporal_ari(cluster_labels_matrix):
 
     return ari_scores
 
-# Call the function and ensure the data includes all intervals
 ari_scores = compute_temporal_ari(cluster_labels_matrix)
 
-# If the ARI scores are correctly calculated for all intervals
-if len(ari_scores) == 14:  # Assuming you expected 14 intervals to be calculated
+if len(ari_scores) == 14: 
     print("ARI scores calculated correctly for all intervals.")
 else:
     print(f"Error: ARI scores were calculated for {len(ari_scores)} intervals.")
 
 # Plotting all the ARIs
 plt.figure(figsize=(10, 6))
-plt.plot(range(1, len(ari_scores) + 1), ari_scores, linestyle='-')  # +1 because range does not include the last value
+plt.plot(range(1, len(ari_scores) + 1), ari_scores, linestyle='-')  
 plt.title('Adjusted Rand Index Over Time', fontsize=22)
 plt.xlabel('Time Window Index', fontsize=18)
 plt.ylabel('Adjusted Rand Index', fontsize=18)
@@ -311,19 +309,18 @@ import numpy as np
 num_windows = cluster_labels_matrix.shape[1]
 window_labels = [f'Time Window {i+1}' for i in range(num_windows)]
 
-# Set an appropriate figure size
 plt.figure(figsize=(16, 14))
 
 ax = sns.heatmap(cluster_labels_matrix, cmap='Blues', cbar_kws={'label': 'Cluster Number'})
 plt.suptitle('Cluster Evolution Over Time [Hierarchical - Euclidean]', fontsize=35, va='top', ha='center', x=0.5, y=0.95)
 ax.set_xlabel('Time Interval', fontsize=18)
 ax.set_ylabel('Stock Index', fontsize=18)
-ax.set_xticklabels(window_labels, rotation=45, ha="right", fontsize=14)  # Adjust x-axis tick label size and orientation
+ax.set_xticklabels(window_labels, rotation=45, ha="right", fontsize=14)  
 ax.tick_params(axis='y', labelsize=14)
 cbar = ax.collections[0].colorbar
-cbar.ax.set_ylabel('Cluster Number', fontsize=18)  # Set and adjust font size of the color bar's label
-cbar.ax.tick_params(labelsize=16)  # Adjust color bar tick label size
-plt.tight_layout(rect=[0, 0, 1, 0.95])  # Adjust the rect to leave space for the title
+cbar.ax.set_ylabel('Cluster Number', fontsize=18)  
+cbar.ax.tick_params(labelsize=16) 
+plt.tight_layout(rect=[0, 0, 1, 0.95])  
 plt.show()
 
 from sklearn.metrics import adjusted_rand_score
@@ -373,7 +370,7 @@ ax[1].set_ylabel('Adjusted Rand Index')
 ax[1].grid(True)
 
 plt.tight_layout()
-plt.savefig("plots.png", dpi=300)  # High-resolution save for better quality in documents
+plt.savefig("plots.png", dpi=300)  
 plt.show()
 
 #Save the clusters in df
@@ -398,13 +395,13 @@ colors = [
 from matplotlib.colors import ListedColormap
 custom_cmap = ListedColormap(colors[:chosen_k])
 
-plt.figure(figsize=(8, 6))  # Use equal width and height for a square plot
+plt.figure(figsize=(8, 6))  
 scatter = plt.scatter(mds_result[:, 0], mds_result[:, 1], c=clusters, cmap=custom_cmap, edgecolor='none', s=50)
 plt.xlabel('MDS Dimension 1', fontsize=14)
 plt.ylabel('MDS Dimension 2', fontsize=14)
 plt.title('MDS Clustering Results [Hierarchical with Kendall\'s Tau]', fontsize=16)
 plt.grid(True)
-plt.axis('equal')  # Set equal scaling by changing axis limits to equal ranges
+plt.axis('equal')  
 plt.show()
 
 
@@ -562,10 +559,7 @@ plt.ylabel('Cluster', fontsize=20, weight='bold')
 plt.xticks(rotation=45, fontsize=16, ha='right', weight='bold')
 plt.yticks(rotation=0, fontsize=16, weight='bold')
 
-# Use tight layout to ensure all parts of the figure are within the canvas
 plt.tight_layout()
-
-# Show the plot
 plt.show()
 
 
@@ -660,7 +654,7 @@ color_data = heatmap.collections[0].get_facecolors()
 
 for text, color in zip(heatmap.texts, color_data):
     # Calculate the brightness of the background
-    luminance = 0.299*color[0] + 0.587*color[1] + 0.114*color[2]  # Standard luminance calculation
+    luminance = 0.299*color[0] + 0.587*color[1] + 0.114*color[2]  
     text.set_color('white' if luminance < 0.5 else 'black')
 
 plt.show()
