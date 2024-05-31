@@ -79,7 +79,6 @@ for symbol in symbols:
     # Write the DataFrame to SQLite database
     df.to_sql(symbol, conn, index=True, if_exists='replace')
 
-# Commit and close the connection
 conn.commit()
 conn.close()
 
