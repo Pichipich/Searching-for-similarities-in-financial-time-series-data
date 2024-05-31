@@ -54,9 +54,6 @@ print("Total number of symbols:", symbol_count)
 
 
 
-
-
-
 desired_row_count = 209
 # Define the start and end dates for your data retrieval
 start_date = '2019-01-01'
