@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from scipy.cluster.hierarchy import fcluster
 import seaborn as sns
 
+
 symbols = ['AMAT', 'JPM', 'NVDA', 'GE', 'HD', 'INTC', 'QCOM', 'HON', 'WFC',
            'AAPL', 'MSFT', 'TXN', 'GOOG', 'USB', 'GOOGL', 'GILD', 'AMZN', 'PEP',
            'LLY', 'MNST', 'CDNS', 'META', 'MU', 'TSLA', 'HSBC',
@@ -115,7 +116,6 @@ calinski_harabasz_scores_normalized_original = [score / max(calinski_harabasz_sc
 davies_bouldin_scores_normalized_original = [1 / (score + 1e-8) for score in davies_bouldin_scores_original]
 davies_bouldin_scores_normalized_original = [score / max(davies_bouldin_scores_normalized_original) for score in davies_bouldin_scores_normalized_original]
 
-import matplotlib.pyplot as plt
 
 plt.figure(figsize=(12, 8))
 plt.plot(range(2, 10), silhouette_scores_normalized_original, label='Silhouette Score - Original', color='red')
@@ -216,9 +216,6 @@ plt.show()
 
 
 
-
-
-import seaborn as sns
 
 # Distance matrix and clustering
 processed_symbols = list(dfs.keys())
@@ -372,7 +369,7 @@ cluster_labels_matrix, average_ari_scores = temporal_cluster_validation(stock_da
                                                                         num_clusters)
 
 # Calculate the mean of the ARI scores
-mean_ari = np.mean(average_ari_scores) if average_ari_scores else float('nan')  # Safeguard in case the list is empty
+mean_ari = np.mean(average_ari_scores) if average_ari_scores else float('nan')  
 
 # Print or visualize the average ARI score
 print(f"Average ARI across all time windows: {mean_ari}")
@@ -399,8 +396,7 @@ plt.show()
 
 
 
-import matplotlib.pyplot as plt
-import seaborn as sns
+
 
 num_windows = cluster_labels_matrix.shape[1]  # Number of time windows
 
