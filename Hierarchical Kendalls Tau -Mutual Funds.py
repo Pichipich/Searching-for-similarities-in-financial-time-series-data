@@ -78,6 +78,7 @@ conn.close()
 start_time = time.time()
 columns_of_interest = ['Adj Close']
 
+#calculate returns
 for symbol, df in dfs.items():
     df['Return'] = df['Adj Close'].pct_change()
 
@@ -113,8 +114,7 @@ reduced_data_dms = mds.fit_transform(distance_matrix)
 
 reduced_data_with_clusters_dms = pd.DataFrame(reduced_data_dms, columns=['MDS1', 'MDS2'])
 
-
-#scores before outlier detection
+#calculate evaluation metrics for different number of clusters
 
 from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
 import numpy as np
@@ -212,7 +212,7 @@ import seaborn as sns
 # Distance matrix and clustering
 processed_symbols = list(dfs.keys())
 stock_data = np.array([dfs[symbol].values.flatten() for symbol in processed_symbols])
-num_clusters = 11  # Set based on earlier analysis
+num_clusters = 11  # number of clusters chosen 
 window_size = 26  # half-yearly data
 step_size = 13   # overlap of half a year
 
@@ -302,35 +302,6 @@ plt.grid(True)
 plt.show()
 
 
-from sklearn.metrics import jaccard_score
-
-def compute_temporal_jaccard(cluster_labels_matrix):
-    num_windows = cluster_labels_matrix.shape[1]
-    jaccard_scores = []
-
-    for i in range(num_windows - 1):
-        current_labels = cluster_labels_matrix[:, i]
-        next_labels = cluster_labels_matrix[:, i + 1]
-        jaccard = jaccard_score(current_labels, next_labels, average='macro')  # or 'weighted', 'micro'
-        jaccard_scores.append(jaccard)
-
-    return jaccard_scores
-
-# Compute Jaccard Index over time
-jaccard_scores = compute_temporal_jaccard(cluster_labels_matrix)
-
-# Plot Jaccard Index over time
-plt.figure(figsize=(10, 6))
-plt.plot(range(len(jaccard_scores)), jaccard_scores, linestyle='-')
-plt.title('Jaccard Index Over Time',fontsize=22)
-plt.xlabel('Time Window Index')
-plt.ylabel('Jaccard Index')
-plt.grid(True)
-plt.show()
-
-
-
-
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -343,31 +314,16 @@ window_labels = [f'Time Window {i+1}' for i in range(num_windows)]
 # Set an appropriate figure size
 plt.figure(figsize=(16, 14))
 
-# Create the heatmap without annotations
 ax = sns.heatmap(cluster_labels_matrix, cmap='Blues', cbar_kws={'label': 'Cluster Number'})
-
-# Adjust font sizes for labels and title using suptitle for better control
 plt.suptitle('Cluster Evolution Over Time [Hierarchical - Euclidean]', fontsize=35, va='top', ha='center', x=0.5, y=0.95)
-
-# Set labels with adjusted font sizes
 ax.set_xlabel('Time Interval', fontsize=18)
 ax.set_ylabel('Stock Index', fontsize=18)
-
-# Set and rotate x-axis labels for better visibility
 ax.set_xticklabels(window_labels, rotation=45, ha="right", fontsize=14)  # Adjust x-axis tick label size and orientation
-
-# Adjust y-axis label sizes
 ax.tick_params(axis='y', labelsize=14)
-
-# Adjust color bar label size
 cbar = ax.collections[0].colorbar
 cbar.ax.set_ylabel('Cluster Number', fontsize=18)  # Set and adjust font size of the color bar's label
 cbar.ax.tick_params(labelsize=16)  # Adjust color bar tick label size
-
-# Use tight layout to automatically adjust subplot params
 plt.tight_layout(rect=[0, 0, 1, 0.95])  # Adjust the rect to leave space for the title
-
-# Show the plot
 plt.show()
 
 from sklearn.metrics import adjusted_rand_score
@@ -439,7 +395,6 @@ colors = [
     '#808000', '#ffd8b1', '#000075', '#808080', '#ffffff', '#000000'
 ]
 
-# Create a colormap from the list of colors
 from matplotlib.colors import ListedColormap
 custom_cmap = ListedColormap(colors[:chosen_k])
 
@@ -500,7 +455,7 @@ for cluster_num in sorted(clusters_df['Cluster'].unique()):
     print(f"Cluster {cluster_num}: {', '.join(cluster_stocks)}")
 
 
-#identify stocks in clusters being in the same sector
+#identify mutual funds in clusters being in the same sector
 company_mapping = {
 
     "ZGFIX": "Ninety One",   "FDVLX": "Fidelity",  "GNSRX": "abrdn",  "FSLBX": "Fidelity",  "CRIMX": "CRM",  "NWKCX": "Nationwide",   "NWHZX": "Nationwide",
@@ -597,20 +552,13 @@ plt.show()
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Set the size of the figure larger to allow for better visibility of annotations
 plt.figure(figsize=(16, 10))
 
 # Create the heatmap with adjusted settings
 heatmap = sns.heatmap(cluster_sector_percentages, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5, annot_kws={"size": 12})
-
-# Set the title with increased font size and additional padding for aesthetics
 plt.title('Hierarchical Clustering with Kendall\'s Tau', fontsize=24, pad=20, weight='bold')
-
-# Set labels for axes with increased font size and weight
 plt.xlabel('Company', fontsize=20, weight='bold')
 plt.ylabel('Cluster', fontsize=20, weight='bold')
-
-# Adjust tick parameters for x and y axes for better readability and alignment
 plt.xticks(rotation=45, fontsize=16, ha='right', weight='bold')
 plt.yticks(rotation=0, fontsize=16, weight='bold')
 
@@ -668,11 +616,9 @@ print('Cluster Trends (Filtered):', cluster_trends_filtered)
 
 from collections import defaultdict, Counter
 
-# Extract the filtered symbols and their corresponding cluster labels.
 filtered_symbols = filtered_clusters_df['Symbol'].tolist()
 filtered_clusters = filtered_clusters_df['Cluster'].tolist()
 
-# Adjusted cluster_purity function to directly use filtered data from DataFrame.
 def cluster_purity(filtered_clusters, filtered_symbols, company_mapping):
     symbol_to_cluster = {symbol: cluster for symbol, cluster in zip(filtered_symbols, filtered_clusters)}
     cluster_sectors = defaultdict(Counter)
@@ -700,32 +646,21 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
-# Increase the figure size to better accommodate larger cells
 plt.figure(figsize=(20, 12))
 
-# Create the heatmap with increased font size for annotations
+# Create the heatmap 
 heatmap = sns.heatmap(cluster_sector_percentages, annot=True, cmap='Blues', fmt=".2f", linewidths=.5, annot_kws={"fontsize": 16})
-
-# Title and labels with appropriate font sizes
 plt.title('Hierarchical Clustering with Kendall\'s Tau', fontsize=28, pad=20)
 plt.xlabel('Company', fontsize=22)
 plt.ylabel('Cluster', fontsize=22)
-
-# Rotate tick labels for better visibility and fit
 plt.xticks(rotation=45, fontsize=16, ha='right')
 plt.yticks(rotation=0, fontsize=16)
-
-# Adjust layout to make room for all elements; padding added to prevent clipping of tick labels
 plt.tight_layout(pad=1)
-
-# Get the color data of the heatmap
 color_data = heatmap.collections[0].get_facecolors()
 
-# Adjust text color based on background color for better visibility
 for text, color in zip(heatmap.texts, color_data):
     # Calculate the brightness of the background
     luminance = 0.299*color[0] + 0.587*color[1] + 0.114*color[2]  # Standard luminance calculation
     text.set_color('white' if luminance < 0.5 else 'black')
 
-# Display the plot
 plt.show()
