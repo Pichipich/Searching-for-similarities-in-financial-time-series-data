@@ -140,10 +140,4 @@ company_mapping = {
 }
 
 
-symbol_count = len(company_mapping_filtered)
-print("Total number of symbols:", symbol_count)
 
-
-missing_symbols = [symbol for symbol in symbols if symbol not in company_mapping_filtered.keys()]
-
-print(missing_symbols)
