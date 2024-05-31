@@ -96,7 +96,7 @@ reduced_data_dms = mds.fit_transform(euclidean_distance_matrix)
 reduced_data_with_clusters_dms = pd.DataFrame(reduced_data_dms, columns=['MDS1', 'MDS2', 'MDS3', 'MDS4'])
 
 
-#scores before outlier detection
+#calculate evaluation metrics for different number of clusters
 
 silhouette_scores_original = []
 calinski_harabasz_scores_original = []
@@ -373,13 +373,13 @@ colors = [
 from matplotlib.colors import ListedColormap
 custom_cmap = ListedColormap(colors[:chosen_k])
 
-plt.figure(figsize=(8, 6))  # Use equal width and height for a square plot
+plt.figure(figsize=(8, 6))  
 scatter = plt.scatter(mds_result[:, 0], mds_result[:, 1], c=clusters, cmap=custom_cmap, edgecolor='none', s=50)
 plt.xlabel('MDS Dimension 1', fontsize=14)
 plt.ylabel('MDS Dimension 2', fontsize=14)
 plt.title('MDS Clustering Results [Hierarchical with Euclidean]', fontsize=16)
 plt.grid(True)
-plt.axis('equal')  # Set equal scaling by changing axis limits to equal ranges
+plt.axis('equal')  
 plt.show()
 
 
