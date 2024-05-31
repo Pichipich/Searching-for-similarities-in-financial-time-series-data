@@ -37,11 +37,8 @@ print("Total number of symbols:", symbol_count)
 
 
 
-
-
-
 desired_row_count = 209
-# Define the start and end dates for your data retrieval
+# Define the start and end dates for data retrieval
 start_date = '2019-01-01'
 end_date = '2022-12-31'
 
@@ -62,7 +59,6 @@ for symbol in symbols:
     # Write the DataFrame to SQLite database
     df.to_sql(symbol, conn, index=True, if_exists='replace')
 
-# Commit and close the connection
 conn.commit()
 conn.close()
 
