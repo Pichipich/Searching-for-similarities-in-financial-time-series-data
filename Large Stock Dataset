@@ -59,7 +59,6 @@ symbols = [
 ]
 
 
-
 # Create SQLite connection and cursor
 conn = sqlite3.connect('large_stock_dataset.db')
 cursor = conn.cursor()
