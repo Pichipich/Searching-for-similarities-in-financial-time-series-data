@@ -107,7 +107,7 @@ reduced_data_dms = mds.fit_transform(dtw_distance_matrix)
 
 reduced_data_with_clusters_dms = pd.DataFrame(reduced_data_dms, columns=['MDS1', 'MDS2'])
 
-#scores before outlier detection
+#calculation of evaluation scores for different numbers of clusters
 
 silhouette_scores_original = []
 calinski_harabasz_scores_original = []
@@ -149,23 +149,19 @@ print(f"Optimal Number of Clusters (Davies-Bouldin): {optimal_clusters_hierarchi
 
 
 
-#EVALUATION SCORES
-# Chosen number of clusters after evaluation
+#EVALUATION SCORES for the chosen number of k
 chosen_k =9
-# Generating the clusters based on the chosen k
+# Generate the clusters based on the chosen k
 clusters = fcluster(linkage_matrix, chosen_k, criterion='maxclust')
 
-# Calculating the evaluation scores for the chosen k
 silhouette_avg = silhouette_score(dtw_distance_matrix, clusters, metric='precomputed')
 calinski_harabasz_avg = calinski_harabasz_score(reduced_data_dms, clusters)
 davies_bouldin_avg = davies_bouldin_score(reduced_data_dms, clusters)
 
-# Print out the evaluation scores for the chosen k
 print(f"Silhouette Score: {silhouette_avg}")
 print(f"Calinski-Harabasz Score: {calinski_harabasz_avg}")
 print(f"Davies-Bouldin Score: {davies_bouldin_avg}")
 
-# Assume silhouette_scores_original, calinski_harabasz_scores_original, and davies_bouldin_scores_original contain the scores from 2 to 40 clusters as calculated previously
 
 # Normalize scores for the chosen k
 def normalize_score(score, scores_list):
@@ -236,7 +232,6 @@ colors = [
     '#808000', '#ffd8b1', '#000075', '#808080', '#ffffff', '#000000'
 ]
 
-# Create a colormap from the list of colors
 from matplotlib.colors import ListedColormap
 custom_cmap = ListedColormap(colors[:chosen_k])
 
@@ -256,7 +251,7 @@ import seaborn as sns
 # Distance matrix and clustering
 processed_symbols = list(dfs.keys())
 stock_data = np.array([dfs[symbol].values.flatten() for symbol in processed_symbols])
-num_clusters = 4  # Set based on earlier analysis
+num_clusters = 4  
 window_size = 26  # half-yearly data
 step_size = 13   # overlap of half a year
 
@@ -286,7 +281,6 @@ def temporal_cluster_validation(stock_data, window_size, step_size, num_clusters
         end_idx = start_idx + window_size
         window_data = stock_data[:, start_idx:end_idx]
 
-        # Ensure window data is correctly reshaped if needed
         flattened_data = window_data.reshape(window_data.shape[0], -1)
         window_distance_matrix = compute_distance_matrix(flattened_data)
 
@@ -297,7 +291,6 @@ def temporal_cluster_validation(stock_data, window_size, step_size, num_clusters
 
     return np.array(cluster_labels_over_time).T  # Transpose to make rows correspond to stocks
 
-# Prepare the return data for temporal clustering
 processed_symbols = list(dfs.keys())
 stock_returns = np.array([dfs[symbol]['Return'].dropna().values for symbol in processed_symbols if 'Return' in dfs[symbol].columns])
 
@@ -305,7 +298,7 @@ stock_returns = np.array([dfs[symbol]['Return'].dropna().values for symbol in pr
 cluster_labels_matrix = temporal_cluster_validation(stock_returns, window_size=26, step_size=13, num_clusters=num_clusters)
 
 
-
+#calculate ARI scores for different time intervals
 from sklearn.metrics import adjusted_rand_score
 from sklearn.metrics import adjusted_rand_score
 
@@ -341,34 +334,6 @@ plt.grid(True)
 plt.show()
 
 
-from sklearn.metrics import jaccard_score
-
-def compute_temporal_jaccard(cluster_labels_matrix):
-    num_windows = cluster_labels_matrix.shape[1]
-    jaccard_scores = []
-
-    for i in range(num_windows - 1):
-        current_labels = cluster_labels_matrix[:, i]
-        next_labels = cluster_labels_matrix[:, i + 1]
-        jaccard = jaccard_score(current_labels, next_labels, average='macro')  # or 'weighted', 'micro'
-        jaccard_scores.append(jaccard)
-
-    return jaccard_scores
-
-# Compute Jaccard Index over time
-jaccard_scores = compute_temporal_jaccard(cluster_labels_matrix)
-
-# Plot Jaccard Index over time
-plt.figure(figsize=(10, 6))
-plt.plot(range(len(jaccard_scores)), jaccard_scores, linestyle='-')
-plt.title('Jaccard Index Over Time',fontsize=22)
-plt.xlabel('Time Window Index')
-plt.ylabel('Jaccard Index')
-plt.grid(True)
-plt.show()
-
-
-
 
 
 import matplotlib.pyplot as plt
@@ -385,28 +350,15 @@ plt.figure(figsize=(16, 14))
 # Create the heatmap without annotations
 ax = sns.heatmap(cluster_labels_matrix, cmap='Blues', cbar_kws={'label': 'Cluster Number'})
 
-# Adjust font sizes for labels and title using suptitle for better control
 plt.suptitle('Cluster Evolution Over Time [Hierarchical - Euclidean]', fontsize=35, va='top', ha='center', x=0.5, y=0.95)
-
-# Set labels with adjusted font sizes
 ax.set_xlabel('Time Interval', fontsize=18)
 ax.set_ylabel('Stock Index', fontsize=18)
-
-# Set and rotate x-axis labels for better visibility
 ax.set_xticklabels(window_labels, rotation=45, ha="right", fontsize=14)  # Adjust x-axis tick label size and orientation
-
-# Adjust y-axis label sizes
 ax.tick_params(axis='y', labelsize=14)
-
-# Adjust color bar label size
 cbar = ax.collections[0].colorbar
 cbar.ax.set_ylabel('Cluster Number', fontsize=18)  # Set and adjust font size of the color bar's label
 cbar.ax.tick_params(labelsize=16)  # Adjust color bar tick label size
-
-# Use tight layout to automatically adjust subplot params
 plt.tight_layout(rect=[0, 0, 1, 0.95])  # Adjust the rect to leave space for the title
-
-# Show the plot
 plt.show()
 
 from sklearn.metrics import adjusted_rand_score
@@ -469,7 +421,7 @@ plt.show()
 
 
 
-
+#plot MDS
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.manifold import MDS
@@ -508,7 +460,8 @@ for cluster_num in sorted(clusters_df['Cluster'].unique()):
     cluster_stocks = clusters_df[clusters_df['Cluster'] == cluster_num]['Symbol'].tolist()
     print(f"Cluster {cluster_num}: {', '.join(cluster_stocks)}")
 
-#OUTLIERS
+
+#Exclusion of outliers
 
 min_cluster_size = 2
 cluster_sizes = clusters_df['Cluster'].value_counts()
@@ -545,6 +498,7 @@ for cluster_num in sorted(clusters_df['Cluster'].unique()):
 
 
 
+#identify mutual funds in clusters being in the same sector
 
 company_mapping = {
 
@@ -632,14 +586,14 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Assuming cluster_sector_percentages is defined as previously
-plt.figure(figsize=(20, 10))  # Increase the width of the figure to give more room
+plt.figure(figsize=(20, 10))  
 heatmap = sns.heatmap(cluster_sector_percentages, annot=True, cmap='YlGnBu', fmt=".2f")
 plt.title('Cluster Composition by Company', fontsize=20)
 plt.xlabel('Company', fontsize=14)
 plt.ylabel('Cluster', fontsize=14)
-plt.xticks(rotation=90, fontsize=10)  # Rotate labels to 90 degrees for better readability
+plt.xticks(rotation=90, fontsize=10)  
 plt.yticks(rotation=0, fontsize=12)
-plt.tight_layout()  # Adjust layout to fit elements better
+plt.tight_layout()  
 plt.show()
 
 
@@ -647,7 +601,7 @@ plt.show()
 filtered_symbols = [symbol for symbol in symbols if symbol not in outlier_stocks]
 filtered_clusters_df = clusters_df[clusters_df['Symbol'].isin(filtered_symbols)].copy()
 
-
+#calculate returns for intracluster metrics
 for symbol, df in dfs.items():
     df['Return'] = df['Adj Close'].pct_change()
 
@@ -746,41 +700,9 @@ plt.show()
 
 
 
+#plot time series in each cluster
 
 import matplotlib.pyplot as plt
-
-# Assuming 'dfs' is a dictionary of dataframes with time series data for each stock symbol
-# and 'filtered_clusters_df' containing columns 'Symbol' and 'Cluster'
-
-# Unique clusters
-unique_clusters = filtered_clusters_df['Cluster'].unique()
-
-# Plot each cluster's time series individually
-for cluster in unique_clusters:
-    plt.figure(figsize=(14, 6))  # Set a large figure size for readability
-
-    # Get all symbols in this cluster
-    cluster_symbols = filtered_clusters_df[filtered_clusters_df['Cluster'] == cluster]['Symbol']
-
-    # Plot each symbol's time series in the cluster
-    for symbol in cluster_symbols:
-        if symbol in dfs:
-            plt.plot(dfs[symbol]['Date'], dfs[symbol]['Adj Close'], label=symbol)
-
-    plt.title(f'Time Series for Cluster {cluster}', fontsize=20)
-    plt.xlabel('Date', fontsize=18)
-    plt.ylabel('Adjusted Close Price', fontsize=18)
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
-    plt.show()
-
-
-
-import matplotlib.pyplot as plt
-
-# Assuming 'dfs' is a dictionary of dataframes with time series data for each stock symbol
-# and 'filtered_clusters_df' containing columns 'Symbol' and 'Cluster'
 
 # Unique clusters
 unique_clusters = filtered_clusters_df['Cluster'].unique()
@@ -806,7 +728,6 @@ for ax, cluster in zip(axs, unique_clusters):
     ax.legend()
     ax.grid(True)
 
-# Set common labels
 plt.xlabel('Date')
 fig.text(0.06, 0.5, 'Adjusted Close Price', va='center', rotation='vertical', fontsize=12)
 
