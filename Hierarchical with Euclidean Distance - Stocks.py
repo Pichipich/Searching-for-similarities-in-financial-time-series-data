@@ -310,14 +310,13 @@ import numpy as np
 num_windows = cluster_labels_matrix.shape[1]
 window_labels = [f'Time Window {i+1}' for i in range(num_windows)]
 
-# Set a manageable figure size
-plt.figure(figsize=(12, 8))  # Standard size, modify if needed
+plt.figure(figsize=(12, 8))  
 ax = sns.heatmap(cluster_labels_matrix, annot=False, cmap='Blues', cbar_kws={'label': 'Cluster Number'})
 ax.set_title('Cluster Evolution Over Time [Hierarchical - Euclidean]', fontsize=20)
 ax.set_xlabel('Time Interval', fontsize=18)
 ax.set_ylabel('Stock Index', fontsize=18)
-ax.set_xticklabels(window_labels, rotation=45, ha="right")  # Rotate for better visibility
-plt.tight_layout()  # Adjust layout to make room for labels if necessary
+ax.set_xticklabels(window_labels, rotation=45, ha="right")  
+plt.tight_layout()  
 
 plt.show()
 
@@ -327,7 +326,7 @@ import seaborn as sns
 
 num_windows = cluster_labels_matrix.shape[1]  # Number of time windows
 
-fig, ax = plt.subplots(1, 2, figsize=(12, 6))  # Adjust the figsize to fit the aspect ratio and size you desire
+fig, ax = plt.subplots(1, 2, figsize=(12, 6))  
 
 sns.heatmap(cluster_labels_matrix, annot=False, cmap='Blues', cbar_kws={'label': 'Cluster Number'}, ax=ax[0])
 ax[0].set_title('Cluster Assignments Over Time Windows')
@@ -341,7 +340,7 @@ ax[1].set_ylabel('Adjusted Rand Index')
 ax[1].grid(True)
 
 plt.tight_layout()
-plt.savefig("plots.png", dpi=300)  # High-resolution save for better quality in documents
+plt.savefig("plots.png", dpi=300) 
 plt.show()
 
 
@@ -432,157 +431,34 @@ end_time = time.time()
 
 
 
-
 sector_mapping = {
-    "HDB": "Finance", "SCHW": "Finance", "ELV": "Health Care", "BLK": "Finance",
-    "CAH": "Health Care", "GS": "Finance", "RIO": "Basic Materials", "LMT": "Industrials",
-    "SYK": "Health Care", "BKNG": "Consumer Discretionary", "BUD": "Consumer Staples",
-    "PLD": "Real Estate", "BCS": "Finance", "ISRG": "Health Care", "SONY": "Consumer Staples",
-    "SBUX": "Consumer Discretionary", "TD": "Finance", "MUFG": "Finance", "MDT": "Health Care",
-    "DE": "Industrials", "BMY": "Health Care", "BP": "Energy", "TJX": "Consumer Discretionary",
-    "AMT": "Real Estate", "MMC": "Finance", "MDLZ": "Consumer Staples", "SHOP": "Technology",
-    "UBS": "Finance", "PGR": "Finance", "PBR": "Energy", "ADP": "Technology", "EQNR": "Energy",
-    "CB": "Finance", "PANW": "Technology", "LRCX": "Technology", "VRTX": "Technology",
-    "ETN": "Technology", "ADI": "Technology", "REGN": "Health Care", "C": "Finance",
-    "ABNB": "Consumer Discretionary", "IBN": "Finance", "ZTS": "Health Care", "BX": "Finance",
-    "SNPS": "Technology", "BSX": "Health Care", "MELI": "Consumer Discretionary",
-    "DEO": "Consumer Staples", "CME": "Finance", "FI": "Consumer Discretionary", "SO": "Utilities",
-    "EQIX": "Real Estate", "CNI": "Industrials", "CI": "Health Care", "MO": "Consumer Staples",
-    "ENB": "Energy", "GSK": "Health Care", "ITW": "Industrials", "INFY": "Technology",
-    "RELX": "Consumer Discretionary", "KLAC": "Technology", "SHW": "Consumer Discretionary",
-    "CNQ": "Energy", "SLB": "Energy", "NOC": "Industrials", "DUK": "Utilities",
-    "EOG": "Energy", "BALL": "Industrials", "WDAY": "Technology", "VALE": "Basic Materials",
-    "RACE": "Consumer Discretionary", "WM": "Utilities", "STLA": "Consumer Discretionary",
-    "MCO": "Finance", "GD": "Industrials", "CP": "Industrials", "BDX": "Health Care",
-    "RTO": "Consumer Discretionary", "SAN": "Finance", "HCA": "Health Care", "TRI": "Consumer Discretionary",
-    "ANET": "Technology", "FDX": "Consumer Discretionary", "KKR": "Finance", "NTES": "Technology",
-    "SMFG": "Finance", "CSX": "Industrials", "ICE": "Finance", "AON": "Finance",
-    "CL": "Consumer Discretionary", "BTI": "Consumer Staples", "ITUB": "Finance",
-    "PYPL": "Consumer Discretionary", "HUM": "Health Care", "TGT": "Consumer Discretionary",
-    "MCK": "Health Care", "SNOW": "Technology", "CMG": "Consumer Discretionary", "BMO": "Finance",
-    "MAR": "Consumer Discretionary", "APD": "Industrials", "AMX": "Telecommunications",
-    "EPD": "Utilities", "ORLY": "Consumer Discretionary", "E": "Energy", "CRWD": "Technology",
-    "ROP": "Industrials", "MPC": "Energy", "PSX": "Energy", "MMM": "Health Care",
-    "CTAS": "Consumer Discretionary", "PH": "Industrials", "BBVA": "Finance",
-    "LULU": "Consumer Discretionary", "BN": "Finance", "SCCO": "Basic Materials",
-    "HMC": "Consumer Discretionary", "PNC": "Finance", "APH": "Technology",
-    "ECL": "Consumer Discretionary", "CHTR": "Telecommunications", "MSI": "Technology",
-    "BNS": "Finance", "NXPI": "Technology", "TDG": "Industrials", "AJG": "Finance",
-    "PFH": "Finance", "PXD": "Energy", "ING": "Finance", "FCX": "Basic Materials",
-    "TT": "Industrials", "APO": "Finance", "CCI": "Real Estate", "RSG": "Utilities",
-    "NSC": "Industrials", "OXY": "Energy", "EMR": "Technology", "DELL": "Technology",
-    "TEAM": "Technology", "PCAR": "Consumer Discretionary", "PCG": "Utilities",
-    "WPP": "Consumer Discretionary", "AFL": "Finance", "WELL": "Real Estate", "MET": "Finance",
-    "AESC": "Utilities", "EL": "Consumer Discretionary", "PSA": "Real Estate",
-    "AZO": "Consumer Discretionary", "ADSK": "Technology", "CPRT": "Consumer Discretionary",
-    "BSBR": "Finance", "AIG": "Finance", "DXCM": "Health Care", "MCHP": "Technology",
-    "ABEV": "Consumer Staples", "KDP": "Consumer Staples", "ROST": "Consumer Discretionary",
-    "GM": "Consumer Discretionary", "CRH": "Industrials", "SRE": "Utilities",
-    "PAYX": "Consumer Discretionary", "WMB": "Utilities", "CARR": "Industrials",
-    "KHC": "Consumer Staples", "COF": "Finance", "MRVL": "Technology", "DHI": "Consumer Discretionary",
-    "STZ": "Consumer Staples", "TAK": "Health Care", "ET": "Utilities", "IDXX": "Health Care",
-    "ODFL": "Industrials", "HLT": "Consumer Discretionary", "STM": "Technology",
-    "VLO": "Energy", "SPG": "Real Estate", "HES": "Energy", "F": "Consumer Discretionary",
-    "MFG": "Finance", "DLR": "Real Estate", "TRV": "Finance", "EW": "Health Care",
-    "AEP": "Utilities", "SU": "Energy", "MSCI": "Consumer Discretionary", "JD": "Consumer Discretionary",
-    "KMB": "Consumer Staples", "COR": "Real Estate", "NUE": "Industrials", "SGEN": "Health Care",
-    "LNG": "Utilities", "OKE": "Utilities", "FTNT": "Technology", "TEL": "Technology",
-    "CNC": "Health Care", "SQ": "Technology", "PLTR": "Technology", "O": "Real Estate",
-    "BIDU": "Technology", "GWW": "Industrials", "NEM": "Basic Materials", "ADM": "Consumer Staples",
-    "CM": "Finance", "TRP": "Utilities", "IQV": "Health Care", "KMI": "Utilities",
-    "DDOG": "Technology", "D": "Utilities", "KVUE": "Consumer Discretionary", "SPOT": "Consumer Discretionary",
-    "HSY": "Consumer Staples", "EXC": "Utilities", "DASH": "Consumer Discretionary", "HLN": "Consumer Discretionary",
-    "CEG": "Utilities", "LHX": "Industrials", "GIS": "Consumer Staples", "A": "Industrials",
-    "BK": "Finance", "JCI": "Industrials", "EA": "Technology", "SYY": "Consumer Discretionary",
-    "BCE": "Telecommunications", "WDS": "Energy", "LI": "Consumer Discretionary", "MPLX": "Energy",
-    "ALL": "Finance", "WCN": "Utilities", "ALC": "Health Care", "MFC": "Consumer Discretionary",
-    "AME": "Industrials", "DOW": "Industrials", "AMP": "Finance", "FERG": "Miscellaneous",
-    "BBD": "Finance", "PRU": "Finance", "FIS": "Consumer Discretionary", "CTSH": "Technology",
-    "OTIS": "Technology", "YUM": "Consumer Discretionary", "FAST": "Consumer Discretionary",
-    "VRSK": "Technology", "CSGP": "Consumer Discretionary", "LVS": "Consumer Discretionary",
-    "IT": "Consumer Discretionary", "XEL": "Utilities", "ARES": "Finance", "PPG": "Consumer Discretionary",
-    "COIN": "Finance", "TTD": "Technology", "IMO": "Energy", "BKR": "Industrials",
-    "HAL": "Energy", "CMI": "Industrials", "URI": "Industrials", "NDAQ": "Finance",
-    "KR": "Consumer Staples", "ORAN": "Telecommunications", "ROK": "Industrials", "CVE": "Energy",
-    "ED": "Utilities", "SATX": "Technology", "DKNG": "Consumer Discretionary", "VICI": "Real Estate",
-    "BBDO": "Finance", "PEG": "Utilities", "ON": "Technology", "MDB": "Technology",
-    "CTVA": "Industrials", "GEHC": "Technology", "GPN": "Consumer Discretionary", "GOLD": "Basic Materials",
-    "ACGL": "Finance", "DD": "Industrials", "LYB": "Industrials", "SYM": "Industrials", "HBANM": "Finance", "SLF": "Finance", "CHT": "Telecommunications",
-    "MRNA": "Health Care", "NU": "Finance", "PUK": "Finance", "CQP": "Utilities",
-    "RCL": "Consumer Discretionary", "DG": "Consumer Discretionary", "ZS": "Technology",
-    "IR": "Industrials", "EXR": "Real Estate", "VEEV": "Technology", "CCEP": "Consumer Staples",
-    "HPQ": "Technology", "MLM": "Industrials", "GFS": "Technology", "CDW": "Consumer Discretionary",
-    "VMC": "Industrials", "DVN": "Energy", "FICO": "Consumer Discretionary", "DLTR": "Consumer Discretionary",
-    "EFX": "Finance", "CPNG": "Consumer Discretionary", "PWR": "Industrials", "FMX": "Consumer Staples",
-    "TU": "Telecommunications", "SBAC": "Real Estate", "PKX": "Industrials", "FANG": "Energy",
-    "TTWO": "Technology", "MPWR": "Technology", "WBD": "Telecommunications", "WEC": "Utilities",
-    "NTR": "Industrials", "WIT": "Technology", "AEM": "Basic Materials", "HBANP": "Finance",
-    "NET": "Technology", "VOD": "Telecommunications", "ELP": "Utilities", "EC": "Energy",
-    "EIX": "Utilities", "AWK": "Utilities", "SPLK": "Technology", "XYL": "Industrials",
-    "ARGX": "Health Care", "BNH": "Real Estate", "DB": "Finance", "WST": "Health Care",
-    "RBLX": "Technology", "HUBS": "Technology", "WTW": "Finance", "AVB": "Real Estate",
-    "TEF": "Telecommunications", "DFS": "Finance", "CBRE": "Finance", "TLK": "Telecommunications",
-    "KEYS": "Industrials", "BNJ": "Real Estate", "NWG": "Finance", "GLW": "Technology",
-    "GIB": "Consumer Discretionary", "ANSS": "Technology", "ZBH": "Health Care", "DAL": "Consumer Discretionary",
-    "HEI": "Industrials", "SNAP": "Technology", "FTV": "Industrials", "BNTX": "Health Care",
-    "GRMN": "Industrials", "HIG": "Finance", "RMD": "Health Care", "RCI": "Telecommunications",
-    "MTD": "Industrials", "ULTA": "Consumer Discretionary", "CHD": "Consumer Discretionary",
-    "IX": "Finance", "PINS": "Technology", "APTV": "Consumer Discretionary", "BR": "Consumer Discretionary",
-    "WY": "Real Estate", "QSR": "Consumer Discretionary", "STT": "Finance", "TROW": "Finance",
-    "TSCO": "Consumer Discretionary", "TW": "Finance", "VRSN": "Technology", "EQR": "Real Estate",
-    "ICLR": "Health Care", "DTE": "Utilities", "RJF": "Finance", "MTB": "Finance",
-    "WPM": "Basic Materials", "CCL": "Consumer Discretionary", "EBAY": "Consumer Discretionary",
-    "HWM": "Industrials", "SE": "Consumer Discretionary", "MOH": "Health Care", "ALNY": "Health Care",
-    "WAB": "Industrials", "TCOM": "Consumer Discretionary", "FE": "Utilities", "ETR": "Utilities",
-    "FCNCA": "Finance", "BRO": "Finance", "ES": "Utilities", "ZM": "Technology",
-    "ARE": "Real Estate", "FNV": "Basic Materials", "HPE": "Telecommunications", "FITB": "Finance",
-    "AEE": "Utilities", "INVH": "Finance", "CBOE": "Finance", "MT": "Industrials",
-    "NVR": "Consumer Discretionary", "TS": "Industrials", "ROL": "Finance", "CCJ": "Basic Materials",
-    "DOV": "Industrials", "FTS": "Utilities", "STE": "Health Care", "TRGP": "Utilities",
-    "JBHT": "Industrials", "UMC": "Technology", "RKT": "Finance", "BEKE": "Finance",
-    "EBR": "Utilities", "IRM": "Real Estate", "BGNE": "Health Care", "DRI": "Consumer Discretionary",
-    "IFF": "Industrials", "EXPE": "Consumer Discretionary", "PPL": "Utilities", "PTC": "Technology",
-    "CTRA": "Energy", "TECK": "Basic Materials", "TDY": "Industrials", "VTR": "Real Estate",
-    "WRB": "Finance", "STLD": "Industrials", "GPC": "Consumer Discretionary", "ASX": "Technology",
-    "LYV": "Consumer Discretionary", "OWL": "Finance", "DUKB": "Utilities", "NTAP": "Technology",
-    "VLTO": "Industrials", "IOT": "Technology", "MKL": "Finance", "PBA": "Energy",
-    "LH": "Health Care", "KOF": "Consumer Staples", "K": "Consumer Staples", "ERIC": "Technology",
-    "BAX": "Health Care", "FLT": "Consumer Discretionary", "CNP": "Utilities", "MKC": "Consumer Staples",
-    "VIV": "Telecommunications", "PFG": "Finance", "DECK": "Consumer Discretionary", "ILMN": "Health Care",
-    "WMG": "Consumer Discretionary", "TSN": "Consumer Staples", "WBA": "Consumer Staples", "BLDR": "Consumer Discretionary",
-    "BMRN": "Health Care", "CHKP": "Technology", "EXPD": "Consumer Discretionary", "PHG": "Health Care",
-    "CLX": "Consumer Discretionary", "AKAM": "Consumer Discretionary", "ZTO": "Industrials", "FITBI": "Finance",
-    "AXON": "Industrials", "SIRI": "Consumer Discretionary", "TYL": "Technology", "TVE": "Utilities",
-    "AQNB": "Utilities", "EG": "Finance", "VRT": "Technology", "HRL": "Consumer Staples",
-    "RYAN": "Finance", "RPRX": "Health Care", "FDS": "Technology", "AGNCN": "Real Estate",
-    "ATO": "Utilities", "YUMC": "Consumer Discretionary", "NOK": "Technology", "EDR": "Consumer Discretionary",
-    "HBAN": "Finance", "WAT": "Industrials", "AER": "Consumer Discretionary", "LPLA": "Finance",
-    "CMS": "Utilities", "NTRS": "Finance", "BAH": "Consumer Discretionary", "RIVN": "Consumer Discretionary",
-    "WLK": "Industrials", "HOLX": "Health Care", "COO": "Health Care", "FSLR": "Technology",
-    "ALGN": "Health Care", "ASBA": "Finance", "FITBP": "Finance", "SUI": "Real Estate",
-    "LUV": "Consumer Discretionary", "CINF": "Finance", "OMC": "Consumer Discretionary", "STX": "Technology",
-    "J": "Industrials", "HUBB": "Technology", "DT": "Technology", "AGNCM": "Real Estate",
-    "SWKS": "Technology", "RF": "Finance", "VFS": "Finance", "EQT": "Energy",
-    "ENTG": "Technology", "L": "Finance", "AGNCO": "Real Estate", "MGA": "Consumer Discretionary",
-    "FITBO": "Finance", "WSO": "Consumer Discretionary", "AVY": "Consumer Discretionary", "SLMBP": "Finance",
-    "RS": "Industrials", "BSY": "Technology", "BG": "Consumer Staples", "IEX": "Industrials",
-    "CE": "Industrials", "KB": "Finance", "DGX": "Health Care", "WDC": "Technology",
-    "SREA": "Consumer Discretionary", "LDOS": "Technology", "SOJE": "Basic Materials", "ENPH": "Technology",
-    "ROKU": "Telecommunications", "TXT": "Industrials", "AQNU": "Utilities", "PKG": "Consumer Discretionary",
-    "MAA": "Real Estate", "EPAM": "Technology", "SNA": "Consumer Discretionary", "LII": "Industrials",
-    "AEG": "Finance", "GDDY": "Technology", "JBL": "Technology", "FWONK": "Consumer Discretionary",
-    "AGNCP": "Real Estate", "LW": "Consumer Staples", "CNHI": "Industrials", "AGNCL": "Real Estate",
-    "JHX": "Industrials", "MRO": "Energy", "GEN": "Technology", "FOXA": "Industrials",
-    "SHG": "Finance", "ESS": "Real Estate", "WPC": "Real Estate", "ERIE": "Finance",
-    "SYF": "Finance", "CSL": "Industrials", "SMCI": "Technology", "AVTR": "Industrials",
-    "SWK": "Consumer Discretionary", "SQM": "Industrials", "CF": "Industrials", "MANH": "Technology",
-    "MAS": "Consumer Discretionary", "PATH": "Technology", "SSNC": "Technology", "BKDT": "Health Care",
-    "TER": "Industrials", "TME": "Consumer Discretionary", "PARAP": "Industrials", "BAM": "Real Estate",
-    "GGG": "Industrials", "CAG": "Consumer Staples", "DPZ": "Consumer Discretionary", "LOGI": "Technology",
-    "POOL": "Consumer Discretionary", "NDSN": "Industrials", "CFG": "Finance", "AMCR": "Consumer Discretionary",
-    "IHG": "Consumer Discretionary", "RPM": "Consumer Discretionary"}
-
-
+    "AMAT": "Technology", "JPM": "Finance", "NVDA": "Technology", "HD": "Consumer Discretionary",
+    "INTC": "Technology", "QCOM": "Technology", "HON": "Industrials", "WFC": "Finance",
+    "AAPL": "Technology", "MSFT": "Technology", "TXN": "Technology", "GOOG": "Technology",
+    "USB": "Finance", "GOOGL": "Technology", "GILD": "Health Care", "AMZN": "Consumer Discretionary",
+    "PEP": "Consumer Staples", "LLY": "Health Care", "MNST": "Consumer Staples", "CDNS": "Technology",
+    "META": "Technology", "MU": "Technology", "TSLA": "Consumer Discretionary", "HSBC": "Finance",
+    "T": "Telecommunications", "CVS": "Consumer Staples", "BA": "Industrials", "UNH": "Health Care",
+    "TSM": "Technology", "V": "Consumer Discretionary", "NVO": "Health Care", "SHEL": "Energy",
+    "BBY": "Consumer Discretionary", "WMT": "Consumer Discretionary", "XOM": "Energy",
+    "MA": "Consumer Discretionary", "JNJ": "Health Care", "AVGO": "Technology", "PG": "Consumer Discretionary",
+    "ORCL": "Technology", "BHP": "Basic Materials", "AZN": "Health Care", "ADBE": "Technology",
+    "ASML": "Technology", "CVX": "Energy", "MRK": "Health Care", "COST": "Consumer Discretionary",
+    "TM": "Consumer Discretionary", "ABBV": "Health Care", "KO": "Consumer Staples",
+    "NGG": "Utilities", "CRM": "Technology", "BAC": "Finance", "LEN": "Consumer Discretionary",
+    "ACN": "Technology", "MCD": "Consumer Discretionary", "NVS": "Health Care", "BIIB": "Health Care",
+    "NFLX": "Consumer Discretionary", "LIN": "Industrials", "SAP": "Technology", "CSCO": "Technology",
+    "AMD": "Technology", "TMO": "Health Care", "PDD": "Consumer Discretionary", "BABA": "Consumer Discretionary",
+    "ABT": "Health Care", "TMUS": "Telecommunications", "NKE": "Consumer Discretionary",
+    "TTE": "Energy", "TBC": "Telecommunications", "CMCSA": "Consumer Discretionary",
+    "DIS": "Consumer Discretionary", "PFE": "Health Care", "DHR": "Health Care", "VZ": "Telecommunications",
+    "TBB": "Telecommunications", "INTU": "Technology", "PHM": "Consumer Discretionary",
+    "LYG": "Finance", "IBM": "Technology", "AMGN": "Health Care", "PM": "Consumer Staples",
+    "UNP": "Industrials", "NOW": "Technology", "RYAAY": "Consumer Discretionary", "COP": "Energy",
+    "SPGI": "Finance", "TFC": "Finance", "MS": "Finance", "UPS": "Industrials", "CAT": "Industrials",
+    "RY": "Finance", "AXP": "Finance", "UL": "Consumer Staples", "NEE": "Utilities", "UBER": "Consumer Discretionary",
+    "RTX": "Industrials", "LOW": "Consumer Discretionary", "SNY": "Health Care"
+}
 filtered_sector_mapping = {
     symbol: sector for symbol, sector in sector_mapping.items() if symbol in symbols
 }
@@ -736,15 +612,13 @@ plt.ylabel('Cluster', fontsize=22)
 plt.xticks(rotation=45, fontsize=16, ha='right')
 plt.yticks(rotation=0, fontsize=16)
 
-# Adjust layout to make room for all elements; padding added to prevent clipping of tick labels
+# Adjust layout to make room for all elements
 plt.tight_layout(pad=1)
 
 # Get the color data of the heatmap
 color_data = heatmap.collections[0].get_facecolors()
 
-# Adjust text color based on background color for better visibility
 for text, color in zip(heatmap.texts, color_data):
-    # Calculate the brightness of the background
     luminance = 0.299*color[0] + 0.587*color[1] + 0.114*color[2]  # Standard luminance calculation
     text.set_color('white' if luminance < 0.5 else 'black')
 
