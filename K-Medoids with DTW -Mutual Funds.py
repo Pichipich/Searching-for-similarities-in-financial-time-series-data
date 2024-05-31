@@ -25,8 +25,6 @@ symbols = [
     "HWSIX", "EIPIX", "HWSAX"
 ]
 
-
-
 conn = sqlite3.connect('mutual_small_data.db')
 
 unscaled_dfs = {}
