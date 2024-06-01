@@ -1,7 +1,6 @@
 from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.decomposition import PCA
 import sqlite3
 import pandas as pd
 import time
@@ -446,8 +445,6 @@ cluster_sector_percentages = cluster_company_counts.div(cluster_company_counts.s
 print(cluster_sector_percentages)
 
 
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 # Assuming cluster_sector_percentages is defined as previously
 plt.figure(figsize=(20, 10))  # Increase the width of the figure to give more room
