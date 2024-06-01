@@ -21,7 +21,8 @@ Dynamic Time Warping (DTW)
 ,Euclidean Distance
 
 **Data**
-The datasets used in this project include:
+
+The data used in this project include three different length datasets for each financial instrument in order to evaluate the scalability:
 
 Stock prices (open, close, adjusted close, volume)
 
@@ -30,6 +31,7 @@ Mutual fund returns
 The data was collected and preprocessed to ensure consistency and to handle missing values through linear interpolation and forward/backward filling.
 
 **Implementation**
+
 The implementation is done in Python, using libraries such as scipy, numpy, pandas, matplotlib, sklearn, and tslearn.
 
 **Preprocessing:**
@@ -41,14 +43,16 @@ Calculate returns for mutual funds.
 
 **Clustering:***
 
-Compute distance matrices using DTW, Kendall's Tau, and Euclidean distance.
+1. Compute distance matrices using DTW, Kendall's Tau, and Euclidean distance.
 
-Apply K-Medoids and Hierarchical clustering algorithms.
+2. Apply K-Medoids and Hierarchical clustering algorithms.
 
-Determine the optimal number of clusters using evaluation metrics.
+3. Determine the optimal number of clusters using evaluation metrics.
 
 **Evaluation:**
 
-The evaluation metrics used was Silhouette Score, Calinski-Harabasz Index, and Davies-Bouldin Index in order to find the optimal number of clusters and evaluate clustering performance .
+The evaluation metrics used was Silhouette Score, Calinski-Harabasz Index, and Davies-Bouldin Index in order to find the optimal number of clusters and then evaluate clustering performance.
+
 Clustering stability over time for the different methods was implemented using the Adjusted Rand Index (ARI).
+
 Visualize results using dendrograms and Multidimensional Scaling (MDS) plots.
