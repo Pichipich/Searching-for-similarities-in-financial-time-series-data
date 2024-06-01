@@ -24,9 +24,9 @@ The project utilizes the following clustering algorithms and distance metrics:
 
 The data used in this project include three different length datasets for each financial instrument in order to evaluate the scalability:
 
-Stock prices (open, close, adjusted close, volume)
++ Stock prices (open, close, adjusted close, volume)
 
-Mutual fund returns
++ Mutual fund returns
 
 The data was collected and preprocessed to ensure consistency and to handle missing values through linear interpolation and forward/backward filling.
 
@@ -36,9 +36,10 @@ The implementation is done in Python, using libraries such as scipy, numpy, pand
 
 **Preprocessing:**
 
-Load data from an SQLite database.
-Normalize and scale the data.
-Calculate returns for mutual funds.
+
++ Load data from an SQLite database.
++ Normalize and scale the data.
++ Calculate returns for mutual funds.
 
 
 **Clustering:**
@@ -70,11 +71,11 @@ For mutual funds, we examine whether funds that tend to be clustered together, a
 
 3. **Intra cluster metrics**
 
-      **Correlation:** We calculate the average correlation of returns within each cluster to understand intra-cluster similarity.
+      + **Correlation:** We calculate the average correlation of returns within each cluster to understand intra-cluster similarity.
 
-      **Volatility:** We measure the average volatility within clusters to identify the risk profiles of clustered assets.
+      + **Volatility:** We measure the average volatility within clusters to identify the risk profiles of clustered assets.
 
-      **Trends:** We analyze the average trends within clusters using linear regression to determine common movement patterns.
+      + **Trends:** We analyze the average trends within clusters using linear regression to determine common movement patterns.
 
 
 
