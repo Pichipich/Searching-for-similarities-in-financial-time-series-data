@@ -9,55 +9,27 @@ from scipy.spatial.distance import pdist, squareform
 from sklearn.manifold import MDS
 from scipy.stats import linregress
 from scipy.stats import kendalltau
-
-
+from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
+from sklearn.metrics import adjusted_rand_score
 
 symbols = [
-    "ZGFIX", "FDVLX", "GNSRX", "FSLBX", "CRIMX", "NWKCX", "NWHZX", "GGEAX", "RRTRX", "DODGX",
-    "FGIOX", "FERIX", "GWGVX", "PSCZX", "FEATX", "CWCFX", "GWGZX", "JSCRX", "PGOAX", "VSEQX",
-    "TLVCX", "FSHCX", "PSCCX", "GSXIX", "CCVAX", "FSEAX",  "FEAAX", "PSCJX", "BRWIX",
-    "GSCIX", "LCIAX", "GSXAX", "CSVIX", "JDMNX", "TLVAX", "JANEX", "DHLSX",
-    "FERCX",  "FIJPX", "FIQCX", "FIQPX", "FGIZX", "TNBRX", "JGRTX", "DIAYX", "JAENX",
-    "JDMAX", "SGIIX", "PWJQX", "FEGRX", "FAMRX", "TNBIX", "JMGRX", "PWJRX", "DIAMX", "HWCAX",
-    "LGMAX", "TAMVX", "TMVIX", "CRMMX",  "FZAJX", "CSCCX", "FESGX", "FIFFX", "WSMNX",
-    "GSXCX", "JDMRX", "MSFLX", "JGRCX", "VHCOX",  "FVIFX", "FVLZX", "RRTDX", "MSFBX",
-    "TRSSX", "SGENX", "THOFX", "LGMCX", "LSWWX","LGMNX", "THOGX", "GCPNX", "PWJBX", "RPMAX",
-    "PWJAX", "FNSDX", "FDEEX","FGRIX", "CCGSX", "FEYCX", "PSCHX", "PWJCX", "VHCAX", "MSGFX",
-
-
-    "PARDX", "OTCFX", "HMXIX", "FTVFX", "OTIIX", "FCPCX", "ZGFAX", "FJPNX",
-    "NWAMX",  "LCORX", "PWJDX", "CCGIX", "PASSX", "FEYTX", "THORX", "AFCSX",
-    "FCPAX", "FAVFX", "LCRIX", "TRRDX", "THOVX", "FVLKX", "MSFAX", "MGISX", "PWJZX", "NEFOX",
-    "AFCMX", "FEYAX", "HWCIX", "GWGIX", "SIBAX", "FGIKX", "FIVFX", "FCVFX", "THOAX", "NECOX",
-    "TRMIX", "WSMDX", "WBSIX", "HWCCX", "FEYIX", "TRMCX", "SLVAX", "THOIX", "HMXAX", "FIATX",
-    "AFCHX",  "HMXCX", "VPCCX", "WBSNX", "CSVZX", "FITGX",  "RRMVX", "FCPIX",
-    "FIAGX", "FIDZX", "HWLCX", "FTFFX", "DFSGX", "SLVRX", "FIIIX", "SPINX", "THOCX", "CSERX",
-    "HWLAX", "NEOYX", "FIGFX", "SVLCX", "CSRYX", "NOANX", "SSQSX", "HWLIX", "SIVIX",
-    "FAFFX", "CAMWX", "FGTNX", "CAMOX", "AFCWX", "PORIX", "BGRSX", "FKGLX", "FIGCX", "AFVZX",
-    "PORTX", "FOSFX", "AASMX", "SLVIX", "RPGIX", "AFCLX", "TRGAX", "FPJAX",  "BGLSX",
-
-
-    "LSOFX", "TILCX", "FIQLX", "AFCNX", "VADFX", "VADAX", "POAGX", "FOSKX", "USPCX", "FJPIX",
-    "QKBGX", "ABLOX", "FCFFX", "VADRX", "DFDSX", "USPFX", "VADDX", "PURRX", "GWEIX", "VADCX",
-     "GWEZX", "BSGSX", "PVFAX", "AAUTX", "OLVAX", "OLVRX", "PGRQX", "PURZX", "TRRJX",
-    "RCMFX", "MUNDX", "TLVIX", "BSGIX", "CBLRX", "GWETX", "VDIGX", "ECSTX", "SSSIX",
-    "VPMAX", "CBDYX", "OLVCX",   "USPVX", "VGSAX",
-     "VPMCX", "FGABX", "TSCSX", "FJPCX",
-    "QCBGX", "JEQIX", "BLUEX", "SSSFX", "CBALX", "VRGEX", "CLREX", "VGISX", "CBLAX", "PURCX",
-    "EXHAX", "VLSIX", "MNHIX", "FJPTX", "OLVTX", "CBDRX", "QABGX", "HLQVX",  "RRTPX",
-    "PACLX", "QIBGX", "NRGSX", "NBGIX",  "NBGAX", "JLVMX", "COAGX", "VGSCX", "JLVZX",
-    "ERSTX", "JLVRX", "NEAGX", "CBLCX", "EHSTX", "PRWCX", "TRAIX", "PARKX", "SEVSX", "EILVX",
-    "ERLVX", "NBGEX", "PURAX", "DREGX", "SEVPX", "LKBAX", "NBGNX", "QLEIX", "VLSCX", "PUREX",
-    "PCAFX", "PURGX", "NEAIX", "VSTCX", "CSRIX",  "SEVAX", "QLERX",
-    "HHDFX", "FOBPX", "HHDVX", "FCGCX", "WCMSX", "FOBAX", "MNHRX", "GQGPX",
-    "PHRAX", "VRREX","JANBX", "SEBLX", "SBACX",
-    "FSCRX", "NEEGX"
-
+    "WWWFX", "KINCX", "KINAX", "KMKNX", "KMKCX", "KMKAX", "KMKYX", "KNPAX", "KNPYX", "KNPCX",
+    "WWNPX", "KSCYX", "KSOAX", "KSCOX", "KSOCX", "LSHEX", "LSHAX", "LSHUX", "LSHCX", "ENPIX",
+    "ENPSX", "FNRCX", "FSENX", "FIKAX", "FANAX", "FANIX", "FAGNX", "NEEIX", "NEEGX", "FIJGX",
+    "FSTCX", "FTUTX", "FTUCX", "FTUAX", "FTUIX", "RCMFX", "FNARX", "HICGX", "HFCGX",
+    "RYPMX", "RYMNX", "RYMPX", "RYZCX", "FUGAX", "FCGCX", "FIQRX", "FFGTX", "FFGAX", "FFGIX",
+    "FFGCX", "FIKIX", "FUGIX", "FSUTX", "FAUFX", "FUGCX", "BIVIX",  "BIVRX", "NEAIX",
+    "FSLBX", "NEAGX", "QLEIX", "QLERX", "FACVX", "FTCVX", "FIQVX", "FICVX", "FSPCX", "RMLPX",
+    "FCCVX", "FCVSX", "EAFVX", "EIFVX", "DGIFX", "AUERX", "COAGX", "TAVZX", "TAVFX", "TVFVX",
+    "ECFVX", "SGGDX", "EICVX", "EICIX", "MBXAX", "UBVVX", "UBVAX", "UBVFX", "MBXIX", "FEURX",
+    "UBVRX", "UBVTX", "UBVUX", "UBVSX", "DHTAX", "UBVLX", "UBVCX",  "MBXCX", "DHTYX","HWSCX",
+    "HWSIX", "EIPIX", "HWSAX"
 ]
 
+conn = sqlite3.connect('mutual_small_data.db')
 
-conn = sqlite3.connect('large_mutual_data.db')
 
+# Load data from SQLite database and preprocess
 dfs = {}
 columns_to_exclude = ['High', 'Low', 'Open', 'Close']
 unscaled_dfs = {}
@@ -78,21 +50,21 @@ conn.close()
 start_time = time.time()
 columns_of_interest = ['Adj Close']
 
-#calculate returns
+# Calculate returns for each symbol
 for symbol, df in dfs.items():
     df['Return'] = df['Adj Close'].pct_change()
 
 for symbol, df in dfs.items():
     df.dropna(inplace=True)
 
+# Prepare return data for clustering
 num_symbols = len(symbols)
-
 returns_data = np.array([dfs[symbol]['Return'].values for symbol in symbols if 'Return' in dfs[symbol].columns])
 max_length = min([len(dfs[symbol]['Return']) for symbol in symbols if 'Return' in dfs[symbol].columns])
 equal_length_data = np.array([dfs[symbol]['Return'].iloc[:max_length].values for symbol in symbols if 'Return' in dfs[symbol].columns])
 
+# Compute Kendall's Tau distance matrix
 distance_matrix = np.zeros((num_symbols, num_symbols))
-
 for i in range(num_symbols):
     for j in range(i + 1, num_symbols):
         tau, _ = kendalltau(returns_data[i], returns_data[j])
@@ -100,9 +72,9 @@ for i in range(num_symbols):
         distance_matrix[i, j] = distance
         distance_matrix[j, i] = distance
 
-
+# Perform hierarchical clustering
 linkage_matrix = linkage(squareform(distance_matrix), method='average')
-
+# Plot dendrogram
 plt.figure(figsize=(16, 8))
 dendrogram(linkage_matrix, labels=symbols, leaf_rotation=90, leaf_font_size=8)
 plt.title('Dendrogram',fontsize=27)
@@ -115,10 +87,6 @@ reduced_data_dms = mds.fit_transform(distance_matrix)
 reduced_data_with_clusters_dms = pd.DataFrame(reduced_data_dms, columns=['MDS1', 'MDS2'])
 
 #calculate evaluation metrics for different number of clusters
-
-from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
-import numpy as np
-
 silhouette_scores_original = []
 calinski_harabasz_scores_original = []
 davies_bouldin_scores_original = []
@@ -136,19 +104,18 @@ davies_bouldin_scores_normalized_original = [1 / (score + 1e-8) for score in dav
 davies_bouldin_scores_normalized_original = [score / max(davies_bouldin_scores_normalized_original) for score in davies_bouldin_scores_normalized_original]
 
 import matplotlib.pyplot as plt
-
+# Plot clustering quality scores
 plt.figure(figsize=(12, 8))
 plt.plot(range(2, 30), silhouette_scores_normalized_original, label='Silhouette Score - Original', color='red')
 plt.plot(range(2, 30), calinski_harabasz_scores_normalized_original, label='Calinski-Harabasz Index - Original', color='blue')
 plt.plot(range(2, 30), davies_bouldin_scores_normalized_original, label='Inverted Davies-Bouldin Index - Original', color='green')
-
 plt.legend()
 plt.title('Clustering Quality Scores by Number Of Clusters', fontsize=22)
 plt.xlabel('Number of Clusters (k)', fontsize=18)
 plt.ylabel('Normalized Scores', fontsize=18)
 plt.show()
 
-
+# Determine optimal number of clusters based on evaluation metrics
 optimal_clusters_hierarchical = np.argmax(silhouette_scores_original) + 2  # Add 2 to start from k=2
 print(f"Optimal Number of Clusters (Silhouette Score): {optimal_clusters_hierarchical}")
 
@@ -160,14 +127,11 @@ print(f"Optimal Number of Clusters (Davies-Bouldin): {optimal_clusters_hierarchi
 
 
 
-#EVALUATION SCORES
-# Chosen number of clusters after evaluation
+# Evaluation scores for chosen number of clusters
 chosen_k = 11
-
-# Generating the clusters based on the chosen k
 clusters = fcluster(linkage_matrix, chosen_k, criterion='maxclust')
 
-# Calculating the evaluation scores for the chosen k
+# Calculate evaluation scores for the chosen number of clusters
 silhouette_avg = silhouette_score(distance_matrix, clusters, metric='precomputed')
 calinski_harabasz_avg = calinski_harabasz_score(reduced_data_dms, clusters)
 davies_bouldin_avg = davies_bouldin_score(reduced_data_dms, clusters)
@@ -177,7 +141,6 @@ print(f"Silhouette Score: {silhouette_avg}")
 print(f"Calinski-Harabasz Score: {calinski_harabasz_avg}")
 print(f"Davies-Bouldin Score: {davies_bouldin_avg}")
 
-# Assume silhouette_scores_original, calinski_harabasz_scores_original, and davies_bouldin_scores_original contain the scores from 2 to 40 clusters as calculated previously
 
 # Normalize scores for the chosen k
 def normalize_score(score, scores_list):
@@ -202,7 +165,32 @@ plt.ylabel('Normalized Metric Score')
 plt.title('Normalized Clustering Evaluation Metrics')
 plt.show()
 
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.manifold import MDS
+from scipy.cluster.hierarchy import fcluster
 
+
+mds = MDS(n_components=2, dissimilarity='precomputed', random_state=42)
+mds_result = mds.fit_transform(distance_matrix)
+
+colors = [
+    '#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6',
+    '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3',
+    '#808000', '#ffd8b1', '#000075', '#808080', '#ffffff', '#000000'
+]
+
+from matplotlib.colors import ListedColormap
+custom_cmap = ListedColormap(colors[:chosen_k])
+
+plt.figure(figsize=(8, 6))  
+scatter = plt.scatter(mds_result[:, 0], mds_result[:, 1], c=clusters, cmap=custom_cmap, edgecolor='none', s=50)
+plt.xlabel('MDS Dimension 1', fontsize=14)
+plt.ylabel('MDS Dimension 2', fontsize=14)
+plt.title('MDS Clustering Results [Hierarchical with Kendall\'s Tau]', fontsize=16)
+plt.grid(True)
+plt.axis('equal')  
+plt.show()
 
 
 
@@ -251,7 +239,8 @@ def temporal_cluster_validation(stock_data, window_size, step_size, num_clusters
         # Ensure window data is correctly reshaped if needed
         flattened_data = window_data.reshape(window_data.shape[0], -1)
         window_distance_matrix = compute_distance_matrix(flattened_data)
-
+        
+        # Perform hierarchical clustering on the windowed data
         linkage_matrix = linkage(squareform(window_distance_matrix), method='average')
         clusters = fcluster(linkage_matrix, num_clusters, criterion='maxclust')
 
@@ -267,10 +256,6 @@ stock_returns = np.array([dfs[symbol]['Return'].dropna().values for symbol in pr
 cluster_labels_matrix = temporal_cluster_validation(stock_returns, window_size=26, step_size=13, num_clusters=num_clusters)
 
 
-
-from sklearn.metrics import adjusted_rand_score
-from sklearn.metrics import adjusted_rand_score
-
 def compute_temporal_ari(cluster_labels_matrix):
     num_windows = cluster_labels_matrix.shape[1]
     ari_scores = []
@@ -282,9 +267,11 @@ def compute_temporal_ari(cluster_labels_matrix):
         ari_scores.append(ari)
 
     return ari_scores
-
+    
+# Compute ARI scores over time windows
 ari_scores = compute_temporal_ari(cluster_labels_matrix)
 
+# Check if ARI scores were calculated for all intervals
 if len(ari_scores) == 14: 
     print("ARI scores calculated correctly for all intervals.")
 else:
@@ -309,8 +296,8 @@ import numpy as np
 num_windows = cluster_labels_matrix.shape[1]
 window_labels = [f'Time Window {i+1}' for i in range(num_windows)]
 
+# Plot heatmap of cluster evolution over time
 plt.figure(figsize=(16, 14))
-
 ax = sns.heatmap(cluster_labels_matrix, cmap='Blues', cbar_kws={'label': 'Cluster Number'})
 plt.suptitle('Cluster Evolution Over Time [Hierarchical - Euclidean]', fontsize=35, va='top', ha='center', x=0.5, y=0.95)
 ax.set_xlabel('Time Interval', fontsize=18)
@@ -377,32 +364,7 @@ plt.show()
 clusters_df = pd.DataFrame({'Symbol': symbols, 'Cluster': clusters})
 reduced_data_with_clusters_dms['Cluster'] = clusters
 
-import matplotlib.pyplot as plt
-import numpy as np
-from sklearn.manifold import MDS
-from scipy.cluster.hierarchy import fcluster
 
-
-mds = MDS(n_components=2, dissimilarity='precomputed', random_state=42)
-mds_result = mds.fit_transform(distance_matrix)
-
-colors = [
-    '#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6',
-    '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3',
-    '#808000', '#ffd8b1', '#000075', '#808080', '#ffffff', '#000000'
-]
-
-from matplotlib.colors import ListedColormap
-custom_cmap = ListedColormap(colors[:chosen_k])
-
-plt.figure(figsize=(8, 6))  
-scatter = plt.scatter(mds_result[:, 0], mds_result[:, 1], c=clusters, cmap=custom_cmap, edgecolor='none', s=50)
-plt.xlabel('MDS Dimension 1', fontsize=14)
-plt.ylabel('MDS Dimension 2', fontsize=14)
-plt.title('MDS Clustering Results [Hierarchical with Kendall\'s Tau]', fontsize=16)
-plt.grid(True)
-plt.axis('equal')  
-plt.show()
 
 
 
@@ -454,59 +416,23 @@ for cluster_num in sorted(clusters_df['Cluster'].unique()):
 
 #identify mutual funds in clusters being in the same sector
 company_mapping = {
-
-    "ZGFIX": "Ninety One",   "FDVLX": "Fidelity",  "GNSRX": "abrdn",  "FSLBX": "Fidelity",  "CRIMX": "CRM",  "NWKCX": "Nationwide",   "NWHZX": "Nationwide",
-    "GGEAX": "Nationwide", "RRTRX": "T. Rowe Price",
-    "DODGX": "Dodge & Cox",  "FGIOX": "Fidelity",   "FERIX": "Fidelity",   "GWGVX": "AMG",  "PSCZX": "PGIM",  "FEATX": "Fidelity",  "CWCFX": "Christopher Weil & Co",
-    "GWGZX": "AMG", "JSCRX": "PGIM",  "PGOAX": "PGIM",  "VSEQX": "Vanguard",  "TLVCX": "Timothy",
-    "FSHCX": "Fidelity",  "PSCCX": "PGIM",  "GSXIX": "abrdn",  "CCVAX": "Calvert",  "FSEAX": "Fidelity",  "FEAAX": "Fidelity",
-    "PSCJX": "PGIM", "BRWIX": "AMG",  "GSCIX": "abrdn", "LCIAX": "SEI", "GSXAX": "abrdn", "CSVIX": "Calvert", "JDMNX": "Janus Henderson",   "TLVAX": "Timothy", "JANEX": "Janus Henderson",
-    "DHLSX": "Diamond Hill",  "FERCX": "Fidelity",  "FIJPX": "Fidelity", "FIQPX": "Fidelity",  "FGIZX": "Fidelity",   "TNBRX": "1290 SmartBeta",
-    "JGRTX": "Janus Henderson", "DIAYX": "Diamond Hill", "JAENX": "Janus Henderson", "JDMAX": "Janus Henderson",  "SGIIX": "First Eagle",
-    "PWJQX": "PGIM", "FEGRX": "First Eagle",  "FAMRX": "Fidelity",  "TNBIX": "1290 SmartBeta","JMGRX": "Janus Henderson",
-    "PWJRX": "PGIM", "DIAMX": "Diamond Hill", "HWCAX": "Hotchkis & Wiley",  "LGMAX": "Loomis Sayles",  "TAMVX": "T. Rowe Price", "TMVIX": "Timothy",
-    "CRMMX": "CRM", "FZAJX": "Fidelity", "CSCCX": "Calvert", "FESGX": "First Eagle", "FIFFX": "Fidelity",  "WSMNX": "William Blair",   "GSXCX": "abrdn", "JDMRX": "Janus Henderson",
-    "MSFLX": "Morgan Stanley", "JGRCX": "Janus Henderson","VHCOX": "Vanguard",  "FVIFX": "Fidelity",  "FVLZX": "Fidelity",  "RRTDX": "T. Rowe Price",  "MSFBX": "Morgan Stanley",   "TRSSX": "T. Rowe Price","SGENX": "First Eagle",
-    "THOFX": "Thornburg",  "LGMCX": "Loomis Sayles", "LSWWX": "Loomis Sayles",  "LGMNX": "Loomis Sayles",
-    "THOGX": "Thornburg",  "GCPNX": "Gateway",  "PWJBX": "PGIM",  "RPMAX": "Reinhart",  "PWJAX": "PGIM",   "FNSDX": "Fidelity", "FDEEX": "Fidelity",  "FGRIX": "Fidelity", "CCGSX": "Baird", "FEYCX": "Fidelity",
-    "PSCHX": "PGIM", "PWJCX": "PGIM", "VHCAX": "Vanguard", "MSGFX": "Morgan Stanley",  "PARDX": "T. Rowe Price",
-    "OTCFX": "T. Rowe Price",  "HMXIX": "AlphaCentric",  "FTVFX": "Fidelity",  "OTIIX": "T. Rowe Price", "FCPCX": "Fidelity", "ZGFAX": "Ninety One",
-    "FJPNX": "Fidelity",   "NWAMX": "Nationwide",  "LCORX": "Leuthold Core",   "PWJDX": "PGIM",   "CCGIX": "Baird",  "PASSX": "T. Rowe Price",  "FEYTX": "Fidelity",  "THORX": "Thornburg",  "AFCSX": "American Century",  "FCPAX": "Fidelity",  "FAVFX": "Fidelity",   "LCRIX": "Leuthold","TRRDX": "T. Rowe Price",   "THOVX": "Thornburg",
-    "FVLKX": "Fidelity", "MSFAX": "Morgan Stanley", "MGISX": "Morgan Stanley", "PWJZX": "PGIM", "NEFOX": "Natixis",
-    "AFCMX": "American Century",    "FEYAX": "Fidelity",   "HWCIX": "Hotchkis & Wiley",   "GWGIX": "AMG",
-    "SIBAX": "Sit Balanced",  "FGIKX": "Fidelity",  "FIVFX": "Fidelity",  "FCVFX": "Fidelity", "THOAX": "Thornburg",  "NECOX": "Natixis Oakmark",
-    "TRMIX": "T. Rowe Price",  "WSMDX": "William Blair",  "WBSIX": "William Blair",  "HWCCX": "Hotchkis & Wiley",  "FEYIX": "Fidelity",  "TRMCX": "T. Rowe Price",  "SLVAX": "Columbia",
-    "THOIX": "Thornburg","HMXAX": "AlphaCentric","FIATX": "Fidelity",   "AFCHX": "American Century",   "HMXCX": "AlphaCentric", "VPCCX": "Vanguard",    "WBSNX": "William Blair",
-    "CSVZX": "Columbia",  "FITGX": "Fidelity",  "RRMVX": "T. Rowe Price",  "FCPIX": "Fidelity",    "FIAGX": "Fidelity",  "FIDZX": "Fidelity", "HWLCX": "Hotchkis & Wiley",
-    "FTFFX": "Fidelity",  "DFSGX": "DF Dent",  "SLVRX": "Columbia",  "FIIIX": "Fidelity",   "SPINX": "SEI",   "THOCX": "Thornburg",
-    "CSERX": "Columbia",    "HWLAX": "Hotchkis & Wiley",    "NEOYX": "Natixis",    "FIGFX": "Fidelity",    "SVLCX": "Columbia",
-    "CSRYX": "Columbia",  "NOANX": "Natixis",  "SSQSX": "State Street",  "HWLIX": "Hotchkis & Wiley",  "SIVIX": "State Street",  "FAFFX": "Fidelity",
-    "CAMWX": "Cambiar",  "FGTNX": "Fidelity",  "CAMOX": "Cambiar",  "AFCWX": "American Century",  "PORIX": "Trillium",  "BGRSX": "Boston Partners",
-    "FKGLX": "Fidelity",  "FIGCX": "Fidelity",  "AFVZX": "Applied Finance",  "PORTX": "Trillium",  "FOSFX": "Fidelity",  "AASMX": "Thrivent",  "SLVIX": "Columbia",
-    "RPGIX": "T. Rowe Price", "AFCLX": "American Century", "TRGAX": "T. Rowe Price", "FPJAX": "Fidelity",  "BGLSX": "Boston Partners",  "LSOFX": "LS Opportunity",
-    "TILCX": "T. Rowe Price",  "FIQLX": "Fidelity",  "AFCNX": "American Century",  "VADFX": "Invesco",  "VADAX": "Invesco",  "POAGX": "PRIMECAP",  "FOSKX": "Fidelity",  "USPCX": "Union Street Partners", "FJPIX": "Fidelity",
-    "QKBGX": "Federated",  "ABLOX": "Alger",  "FCFFX": "Fidelity",  "VADRX": "Invesco",  "DFDSX": "DF Dent",  "USPFX": "Union","VADDX": "Invesco",
-    "PURRX": "PGIM",  "GWEIX": "AMG",  "VADCX": "Invesco",  "GWEZX": "AMG",  "BSGSX": "Baird",   "PVFAX": "Paradigm Value",
-    "AAUTX": "Thrivent", "OLVAX": "JPMorgan", "OLVRX": "JPMorgan", "PGRQX": "PGIM", "PURZX": "PGIM", "TRRJX": "T. Rowe Price", "RCMFX": "Schwartz",
-    "MUNDX": "Mundoval",  "TLVIX": "Thrivent",  "BSGIX": "Baird",  "CBLRX": "Columbia",  "GWETX": "AMG","VDIGX": "Vanguard",   "ECSTX": "Eaton Vance",  "SSSIX": "SouthernSun",
-    "VPMAX": "Vanguard",  "CBDYX": "Columbia",  "OLVCX": "JPMorgan",  "USPVX": "Union Street Partners",  "VGSAX": "Virtus Duff & Phelps",  "VPMCX": "Vanguard",
-    "FGABX": "Fidelity", "TSCSX": "Thrivent", "FJPCX": "Fidelity", "QCBGX": "Hermes", "JEQIX": "Johnson",
-    "BLUEX": "AMG", "SSSFX": "SouthernSun", "CBALX": "Columbia", "VRGEX": "Virtus", "CLREX": "Columbia",    "VGISX": "Virtus Duff & Phelps","CBLAX": "Columbia",  "PURCX": "PGIM",  "EXHAX": "Manning & Napier",   "VLSIX": "Virtus",   "MNHIX": "Manning & Napier",
-    "FJPTX": "Fidelity",  "OLVTX": "JPMorgan",  "CBDRX": "Columbia",  "QABGX": "Hermes",
-    "HLQVX": "JPMorgan", "RRTPX": "T. Rowe Price",   "PACLX": "T. Rowe Price", "QIBGX": "Hermes",   "NRGSX": "Neuberger Berman",  "NBGIX": "Neuberger Berman", "NBGAX": "Neuberger Berman",
-    "JLVMX": "JPMorgan", "COAGX": "Caldwell & Orkin", "VGSCX": "Virtus", "JLVZX": "JPMorgan", "ERSTX": "Eaton Vance",   "JLVRX": "JPMorgan",
-    "NEAGX": "Needham","CBLCX": "Columbia","EHSTX": "Eaton Vance","PRWCX": "T. Rowe Price","TRAIX": "T. Rowe Price","PARKX": "T. Rowe Price",   "SEVSX": "Guggenheim",   "EILVX": "Eaton Vance",    "ERLVX": "Eaton Vance","NBGEX": "Neuberger Berman",
-    "PURAX": "PGIM",  "DREGX": "Driehaus",  "SEVPX": "Guggenheim", "LKBAX": "LKCM",  "NBGNX": "Neuberger",
-    "QLEIX": "AQR",  "VLSCX": "Virtus",  "PUREX": "PGIM",  "PCAFX": "Prospector",  "PURGX": "PGIM",  "NEAIX": "Needham", "VSTCX": "Vanguard", "AGVDX": "American Funds", "CSRIX": "Cohen & Steers",
-    "CGVBX": "American Funds ", "SEVAX": "Guggenheim", "QLERX": "AQR", "CGVEX": "American Funds", "AGVFX": "American Funds","AGVEX": "American Funds", "CGVYX": "American Funds","RGLEX": "American Funds ",
-    "HHDFX": "Hamlin", "FOBPX": "Tributary", "HHDVX": "Hamlin", "CSJCX": "Cohen & Steers", "FCGCX": "Fidelity", "WCMSX": "WCM","CSJIX": "Cohen & Steers",
-    "CSRSX": "Cohen & Steers",  "CSJAX": "Cohen & Steers",  "CSJRX": "Cohen & Steers", "CSJZX": "Cohen & Steers", "FFGTX": "Fidelity", "MNHCX": "Manning & Napier","FOBAX": "Tributary","MNHRX": "Manning & Napier","GQGPX": "GQG Partners","PHRAX": "Virtus","VRREX": "Virtus","GQGIX": "GQG Partners",   "GQGRX": "GQG Partners",
-    "FMIJX": "FMI",  "VLSAX": "Virtus",  "JDBAX": "Janus Henderson","GURCX": "Guggenheim", "FMIYX": "FMI",   "JABAX": "Janus Henderson",
-    "JABNX": "Janus Henderson", "JBALX": "Janus Henderson", "SCVEX": "Hartford", "DIEMX": "Driehaus", "GURAX": "Guggenheim", "GURPX": "Guggenheim",  "VLSRX": "Virtus", "ICSIX": "Dynamic",  "ICSNX": "Dynamic",  "RYAVX": "Rydex",
-    "EAFVX": "Eaton Vance",  "RYMVX": "Rydex", "VASGX": "Vanguard",  "GTSCX": "Glenmede",  "GURIX": "Guggenheim",  "EIFVX": "Eaton Vance",  "RAIWX": "Manning & Napier",  "JABCX": "Janus Henderson",
-    "BBHLX": "BBH Partner Fund", "RYMMX": "Rydex", "RAIRX": "Manning & Napier",  "JDBRX": "Janus Henderson",  "UGTCX": "Victory Growth and Tax",
-    "BTBFX": "Boston Trust Asset Management","JABRX": "Janus Henderson",   "UGTAX": "Victory Growth and Tax",  "UGTIX": "Victory Growth and Tax",  "JANBX": "Janus Henderson",  "SEBLX": "Touchstone",  "SBACX": "Touchstone",  "FSCRX": "Fidelity","NEEGX": "Needham"
-
+    "WWWFX": "Kinetics",
+    "KINCX": "Kinetics", "KINAX": "Kinetics", "KMKNX": "Kinetics", "KMKCX": "Kinetics", "KMKAX": "Kinetics", "KMKYX": "Kinetics","KNPAX": "Kinetics","KNPYX": "Kinetics", "KNPCX": "Kinetics", "WWNPX": "Kinetics","KSCYX": "Kinetics","KSOAX": "Kinetics",
+    "KSCOX": "Kinetics", "KSOCX": "Kinetics", "LSHEX": "Kinetics", "LSHAX": "Kinetics", "LSHUX": "Kinetics", "LSHCX": "Kinetics", "ENPIX": "ProFunds", "ENPSX": "ProFunds",    "FNRCX": "Fidelity",
+    "FSENX": "Fidelity",  "FIKAX": "Fidelity",  "FANAX": "Fidelity",   "FANIX": "Fidelity", "FAGNX": "Fidelity",
+    "NEEIX": "Needham","NEEGX": "Needham", "FIJGX": "Fidelity", "FSTCX": "Fidelity", "FTUTX": "Fidelity", "FTUCX": "Fidelity",
+    "FTUAX": "Fidelity", "FTUIX": "Fidelity","RCMFX": "Schwartz", "FNARX": "Fidelity",
+    "FMEIX": "Fidelity",  "HICGX": "Hennessy",  "HFCGX": "Hennessy",  "RYPMX": "Rydex",  "RYMNX": "Rydex",   "RYMPX": "Rydex",   "RYZCX": "Rydex",   "FUGAX": "Fidelity",   "FCGCX": "Fidelity",  "FIQRX": "Fidelity", "FFGTX": "Fidelity", "FFGAX": "Fidelity",
+    "FFGIX": "Fidelity", "FFGCX": "Fidelity", "FIKIX": "Fidelity","FUGIX": "Fidelity", "FSUTX": "Fidelity",
+    "FAUFX": "Fidelity",   "FUGCX": "Fidelity",   "BIVIX": "Invenomic",   "BIVSX": "Invenomic", "BIVRX": "Invenomic","NEAIX": "Needham",
+    "FSLBX": "Fidelity","NEAGX": "Needham", "QLEIX": "AQR Long-Short Equity ", "QLERX": "AQR Long-Short Equity ",  "FACVX": "Fidelity",
+    "FTCVX": "Fidelity",  "FIQVX": "Fidelity",  "FICVX": "Fidelity", "FSPCX": "Fidelity",  "RMLPX": "Two Roads Shared Trust",   "FCCVX": "Fidelity",   "FCVSX": "Fidelity",  "EAFVX": "Eaton Vance",   "EIFVX": "Eaton Vance", "DGIFX": "Disciplined Growth Investors",
+    "AUERX": "Auer Growth",   "COAGX": "Caldwell & Orkin - Gator Capital L/S Fd",
+    "TAVZX": "Third Avenue Value","TAVFX": "Third Avenue Value",  "TVFVX": "Third Avenue Value",  "ECFVX": "Eaton Vance",  "SGGDX": "First Eagle Gold",  "EICVX": "EIC", "EICIX": "EIC",
+    "MBXAX": "Catalyst/Millburn Hedge Strategy Fund",  "UBVVX": "Undiscovered Managers",  "UBVAX": "Undiscovered Managers",  "UBVFX": "Undiscovered Managers",
+    "MBXIX": "Catalyst/Millburn Hedge Strategy Fund",  "FEURX": "First Eagle Gold",
+    "UBVRX": "Undiscovered Managers", "UBVTX": "Undiscovered Managers", "UBVUX": "Undiscovered Managers", "UBVSX": "Undiscovered Managers",  "DHTAX": "Diamond Hill Select Fund",
+    "UBVLX": "Undiscovered Managers","UBVCX": "Undiscovered Managers", "MBXFX": "Catalyst/Millburn Hedge Strategy Fund", "MBXCX": "Catalyst/Millburn Hedge Strategy Fund", "DHTYX": "Diamond Hill Select Fund"
 }
 filtered_company_mapping = {
     symbol: sector for symbol, sector in company_mapping.items() if symbol in symbols
