@@ -199,7 +199,7 @@ import seaborn as sns
 
 # Distance matrix and clustering
 processed_symbols = list(dfs.keys())
-stock_data = np.array([dfs[symbol].values.flatten() for symbol in processed_symbols])
+fund_data = np.array([dfs[symbol].values.flatten() for symbol in processed_symbols])
 num_clusters = 11  # number of clusters chosen 
 window_size = 26  # half-yearly data
 step_size = 13   # overlap of half a year
@@ -221,16 +221,16 @@ def compute_distance_matrix(data):
 
 
 
-def temporal_cluster_validation(stock_data, window_size, step_size, num_clusters):
-    num_samples = stock_data.shape[0]
-    num_points = stock_data.shape[1]
+def temporal_cluster_validation(fund_data, window_size, step_size, num_clusters):
+    num_samples = fund_data.shape[0]
+    num_points = fund_data.shape[1]
     num_windows = (num_points - window_size) // step_size + 1
     cluster_labels_over_time = []
 
     for i in range(num_windows):
         start_idx = i * step_size
         end_idx = start_idx + window_size
-        window_data = stock_data[:, start_idx:end_idx]
+        window_data = fund_data[:, start_idx:end_idx]
 
         # Ensure window data is correctly reshaped if needed
         flattened_data = window_data.reshape(window_data.shape[0], -1)
@@ -242,14 +242,14 @@ def temporal_cluster_validation(stock_data, window_size, step_size, num_clusters
 
         cluster_labels_over_time.append(clusters)
 
-    return np.array(cluster_labels_over_time).T  # Transpose to make rows correspond to stocks
+    return np.array(cluster_labels_over_time).T  
 
 # Prepare the return data for temporal clustering
 processed_symbols = list(dfs.keys())
-stock_returns = np.array([dfs[symbol]['Return'].dropna().values for symbol in processed_symbols if 'Return' in dfs[symbol].columns])
+fund_returns = np.array([dfs[symbol]['Return'].dropna().values for symbol in processed_symbols if 'Return' in dfs[symbol].columns])
 
 # Calculate cluster labels over time
-cluster_labels_matrix = temporal_cluster_validation(stock_returns, window_size=26, step_size=13, num_clusters=num_clusters)
+cluster_labels_matrix = temporal_cluster_validation(fund_returns, window_size=26, step_size=13, num_clusters=num_clusters)
 
 
 def compute_temporal_ari(cluster_labels_matrix):
