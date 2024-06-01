@@ -224,24 +224,24 @@ plt.show()
 
 
 
-# Assume dfs is a dictionary with dataframes for each stock symbol
+# Assume dfs is a dictionary with dataframes for each mutual fund symbol
 processed_symbols = list(dfs.keys())
-stock_returns = np.array([dfs[symbol]['Return'].dropna().values for symbol in processed_symbols if 'Return' in dfs[symbol].columns])
+fund_returns = np.array([dfs[symbol]['Return'].dropna().values for symbol in processed_symbols if 'Return' in dfs[symbol].columns])
 
 def compute_distance_matrix(data):
     """ Computes the Euclidean distance matrix for the given data. """
     return squareform(pdist(data, 'euclidean'))
 
-def temporal_cluster_validation(stock_data, window_size, step_size, num_clusters):
-    num_samples = stock_data.shape[0]
-    num_points = stock_data.shape[1]
+def temporal_cluster_validation(fund_data, window_size, step_size, num_clusters):
+    num_samples = fund_data.shape[0]
+    num_points = fund_data.shape[1]
     num_windows = (num_points - window_size) // step_size + 1
     cluster_labels_over_time = []
 
     for i in range(num_windows):
         start_idx = i * step_size
         end_idx = start_idx + window_size
-        window_data = stock_data[:, start_idx:end_idx]
+        window_data = fund_data[:, start_idx:end_idx]
 
         if window_data.shape[1] < window_size:
             continue  # Skip windows that do not have enough data
@@ -254,7 +254,7 @@ def temporal_cluster_validation(stock_data, window_size, step_size, num_clusters
 
         cluster_labels_over_time.append(clusters)
 
-    return np.array(cluster_labels_over_time).T  # Transpose to make rows correspond to stocks
+    return np.array(cluster_labels_over_time).T  # Transpose to make rows correspond to mutual funds
 
 # Set parameters for the temporal validation
 num_clusters = 5  # Adjust the number of clusters based on your specific analysis
@@ -262,7 +262,7 @@ window_size = 26  # Using half-yearly data as the window size
 step_size = 13    # Overlap of half a year
 
 # Calculate cluster labels over time
-cluster_labels_matrix = temporal_cluster_validation(stock_returns, window_size, step_size, num_clusters)
+cluster_labels_matrix = temporal_cluster_validation(fund_returns, window_size, step_size, num_clusters)
 
 # Plotting and analysis functions
 def compute_temporal_ari(cluster_labels_matrix):
@@ -309,7 +309,7 @@ plt.figure(figsize=(12, 8))
 sns.heatmap(cluster_labels_matrix, annot=False, cmap='viridis', cbar_kws={'label': 'Cluster Label'})
 plt.title('Cluster Assignments Over Time Windows', fontsize=22)
 plt.xlabel('Time Window Index')
-plt.ylabel('Stock Index')
+plt.ylabel('Fund Index')
 plt.show()
 
 
@@ -351,7 +351,7 @@ fig, ax = plt.subplots(1, 2, figsize=(12, 6))  # Adjust the figsize to fit the a
 sns.heatmap(cluster_labels_matrix, annot=False, cmap='Blues', cbar_kws={'label': 'Cluster Number'}, ax=ax[0])
 ax[0].set_title('Cluster Assignments Over Time Windows')
 ax[0].set_xlabel('Time Window Index')
-ax[0].set_ylabel('Stock Index')
+ax[0].set_ylabel('Fund Index')
 
 ax[1].plot(range(1, len(ari_scores) + 1), ari_scores, linestyle='-', marker='o')
 ax[1].set_title('Adjusted Rand Index Over Time')
@@ -391,8 +391,8 @@ plt.show()
 
 
 for cluster_num in sorted(clusters_df['Cluster'].unique()):
-    cluster_stocks = clusters_df[clusters_df['Cluster'] == cluster_num]['Symbol'].tolist()
-    print(f"Cluster {cluster_num}: {', '.join(cluster_stocks)}")
+    cluster_funds = clusters_df[clusters_df['Cluster'] == cluster_num]['Symbol'].tolist()
+    print(f"Cluster {cluster_num}: {', '.join(cluster_funds)}")
 
 end_time = time.time()
 elapsed_time = end_time - start_time
@@ -405,12 +405,12 @@ min_cluster_size = 2
 cluster_sizes = clusters_df['Cluster'].value_counts()
 outlier_clusters = cluster_sizes[cluster_sizes < min_cluster_size].index
 
-outlier_stocks = []
+outlier_funds = []
 for cluster in outlier_clusters:
-    stocks_in_cluster = clusters_df[clusters_df['Cluster'] == cluster]['Symbol'].tolist()
-    outlier_stocks.extend(stocks_in_cluster)
+    funds_in_cluster = clusters_df[clusters_df['Cluster'] == cluster]['Symbol'].tolist()
+    outlier_funds.extend(funds_in_cluster)
 
-outlier_indices = np.array([symbols.index(stock) for stock in outlier_stocks]).astype(int)
+outlier_indices = np.array([symbols.index(fund) for fund in outlier_funds]).astype(int)
 
 
 filtered_distance_matrix = np.delete(distance_matrix, outlier_indices, axis=0)
@@ -423,9 +423,9 @@ mds = MDS(n_components=4, dissimilarity='precomputed', random_state=42)
 mds_result_filtered = mds.fit_transform(filtered_distance_matrix)
 
 
-print("Outlier Stocks:")
-for stock in outlier_stocks:
-    print(stock)
+print("Outlier Funds:")
+for fund in outlier_funds:
+    print(fund)
 
 
 
@@ -457,7 +457,7 @@ filtered_company_mapping = {
 }
 
 
-filtered_clusters_df = clusters_df[~clusters_df['Symbol'].isin(outlier_stocks)]
+filtered_clusters_df = clusters_df[~clusters_df['Symbol'].isin(outlier_funds)]
 
 company_df = pd.DataFrame(list(filtered_company_mapping.items()), columns=['Symbol', 'Company'])
 merged_df_filtered = pd.merge(filtered_clusters_df, company_df, on='Symbol')
@@ -467,7 +467,7 @@ sector_composition_filtered = merged_df_filtered.groupby(['Cluster', 'Company'])
 sector_composition_filtered.plot(kind='bar', stacked=True, figsize=(14, 7), colormap='viridis')
 plt.title('Company Composition within Clusters (Excluding Outliers)')
 plt.xlabel('Cluster')
-plt.ylabel('Number of Stocks')
+plt.ylabel('Number of funds')
 plt.legend(title='Sector', bbox_to_anchor=(1.05, 1), loc='upper left')
 plt.tight_layout()
 plt.show()
@@ -494,7 +494,7 @@ plt.show()
 
 
 
-filtered_symbols = [symbol for symbol in symbols if symbol not in outlier_stocks]
+filtered_symbols = [symbol for symbol in symbols if symbol not in outlier_funds]
 filtered_clusters_df = clusters_df[clusters_df['Symbol'].isin(filtered_symbols)].copy()
 
 
