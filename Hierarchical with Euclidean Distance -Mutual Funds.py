@@ -372,7 +372,7 @@ for cluster in outlier_clusters:
 
 outlier_indices = np.array([symbols.index(fund) for fund in outlier_funds]).astype(int)
 
-filtered_distance_matrix = np.delete(distance_matrix, outlier_indices, axis=0)
+filtered_distance_matrix = np.delete(dtw_distance_matrix, outlier_indices, axis=0)
 filtered_distance_matrix = np.delete(filtered_distance_matrix, outlier_indices, axis=1)
 
 filtered_clusters = np.delete(clusters, outlier_indices)
