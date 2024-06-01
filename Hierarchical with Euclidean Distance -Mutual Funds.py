@@ -370,10 +370,10 @@ min_cluster_size =2
 cluster_sizes = clusters_df['Cluster'].value_counts()
 outlier_clusters = cluster_sizes[cluster_sizes < min_cluster_size].index
 
-outlier_fund = []
+outlier_funds = []
 for cluster in outlier_clusters:
-    fund_in_cluster = clusters_df[clusters_df['Cluster'] == cluster]['Symbol'].tolist()
-    outlier_fund.extend(s=funds_in_cluster)
+    funds_in_cluster = clusters_df[clusters_df['Cluster'] == cluster]['Symbol'].tolist()
+    outlier_funds.extend(funds_in_cluster)
 
 outlier_indices = np.array([symbols.index(fund) for fund in outlier_funds]).astype(int)
 
