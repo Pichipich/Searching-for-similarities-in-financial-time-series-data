@@ -11,6 +11,7 @@ from scipy.stats import linregress
 from scipy.stats import kendalltau
 from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
 from sklearn.metrics import adjusted_rand_score
+from scipy.cluster.hierarchy import fcluster
 
 symbols = [
     "WWWFX", "KINCX", "KINAX", "KMKNX", "KMKCX", "KMKAX", "KMKYX", "KNPAX", "KNPYX", "KNPCX",
@@ -165,12 +166,8 @@ plt.ylabel('Normalized Metric Score')
 plt.title('Normalized Clustering Evaluation Metrics')
 plt.show()
 
-import matplotlib.pyplot as plt
-import numpy as np
-from sklearn.manifold import MDS
-from scipy.cluster.hierarchy import fcluster
 
-
+#Plot MDS scatterplot
 mds = MDS(n_components=2, dissimilarity='precomputed', random_state=42)
 mds_result = mds.fit_transform(distance_matrix)
 
@@ -180,9 +177,9 @@ colors = [
     '#808000', '#ffd8b1', '#000075', '#808080', '#ffffff', '#000000'
 ]
 
+# Create a colormap from the list of colors
 from matplotlib.colors import ListedColormap
 custom_cmap = ListedColormap(colors[:chosen_k])
-
 plt.figure(figsize=(8, 6))  
 scatter = plt.scatter(mds_result[:, 0], mds_result[:, 1], c=clusters, cmap=custom_cmap, edgecolor='none', s=50)
 plt.xlabel('MDS Dimension 1', fontsize=14)
@@ -197,7 +194,7 @@ plt.show()
 
 import seaborn as sns
 
-# Distance matrix and clustering
+# Distance matrix and clustering between subsequences 
 processed_symbols = list(dfs.keys())
 fund_data = np.array([dfs[symbol].values.flatten() for symbol in processed_symbols])
 num_clusters = 11  # number of clusters chosen 
@@ -251,7 +248,7 @@ fund_returns = np.array([dfs[symbol]['Return'].dropna().values for symbol in pro
 # Calculate cluster labels over time
 cluster_labels_matrix = temporal_cluster_validation(fund_returns, window_size=26, step_size=13, num_clusters=num_clusters)
 
-
+#function to compute ARI over time
 def compute_temporal_ari(cluster_labels_matrix):
     num_windows = cluster_labels_matrix.shape[1]
     ari_scores = []
@@ -307,7 +304,7 @@ plt.tight_layout(rect=[0, 0, 1, 0.95])
 plt.show()
 
 from sklearn.metrics import adjusted_rand_score
-
+#compute average ARI
 def compute_temporal_ari(cluster_labels_matrix):
     num_windows = cluster_labels_matrix.shape[1]
     ari_scores = []
