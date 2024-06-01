@@ -10,6 +10,8 @@ from kneed import KneeLocator
 from sklearn_extra.cluster import KMedoids
 import numpy as np
 from scipy.cluster.hierarchy import fcluster
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 symbols = [
     "WWWFX", "KINCX", "KINAX", "KMKNX", "KMKCX", "KMKAX", "KMKYX", "KNPAX", "KNPYX", "KNPCX",
@@ -154,7 +156,7 @@ kmedoids.fit(dtw_distance_matrix)
 clusters = kmedoids.labels_  # This will give you the cluster labels
 
 silhouette_avg = silhouette_score(dtw_distance_matrix, clusters, metric='precomputed')
-calinski_harabasz_avg = calinski_harabasz_score(reduced_data_dms, clusters)  
+calinski_harabasz_avg = calinski_harabasz_score(reduced_data_dms, clusters)
 davies_bouldin_avg = davies_bouldin_score(reduced_data_dms, clusters)
 
 # Print out the evaluation scores for the chosen k
@@ -177,32 +179,11 @@ print(f"Normalized Silhouette Score: {normalized_silhouette}")
 print(f"Normalized Calinski-Harabasz Score: {normalized_calinski}")
 print(f"Normalized (Inverted) Davies-Bouldin Score: {normalized_davies_bouldin}")
 
-# Visualization for evaluation
-plt.figure(figsize=(10, 6))
-plt.bar(['Silhouette', 'Calinski-Harabasz', 'Davies-Bouldin'],
-        [normalized_silhouette, normalized_calinski, normalized_davies_bouldin],
-        color=['red', 'blue', 'green'])
-plt.ylabel('Normalized Metric Score')
-plt.title('Normalized Clustering Evaluation Metrics')
-plt.show()
+
 
 
 clusters_df = pd.DataFrame({'Symbol': symbols, 'Cluster': clusters})
 reduced_data_with_clusters_dms['Cluster'] = clusters
-
-from sklearn.manifold import MDS
-
-mds = MDS(n_components=2, random_state=42, dissimilarity='precomputed')
-mds_result = mds.fit_transform(dtw_distance_matrix)
-
-plt.scatter(mds_result[:, 0], mds_result[:, 1], c=clusters, cmap='viridis')
-plt.xlabel('MDS Dimension 1')
-plt.ylabel('MDS Dimension 2')
-plt.title('MDS Clustering Results [K-Medoids with DTW]')
-plt.show()
-
-
-
 
 
 import numpy as np
@@ -213,9 +194,9 @@ from tslearn.metrics import dtw
 
 from sklearn.metrics import adjusted_rand_score, jaccard_score
 
-# Assume dfs is a dictionary with dataframes for each stock symbol
+# Assume dfs is a dictionary with dataframes for each mutual fund symbol
 processed_symbols = list(dfs.keys())
-stock_returns = np.array([dfs[symbol]['Return'].dropna().values for symbol in processed_symbols if 'Return' in dfs[symbol].columns])
+fund_returns = np.array([dfs[symbol]['Return'].dropna().values for symbol in processed_symbols if 'Return' in dfs[symbol].columns])
 
 def compute_distance_matrix(data):
     num_samples = data.shape[0]
@@ -229,16 +210,16 @@ def compute_distance_matrix(data):
 
     return distance_matrix
 
-def temporal_cluster_validation(stock_data, window_size, step_size, num_clusters):
-    num_samples = stock_data.shape[0]
-    num_points = stock_data.shape[1]
+def temporal_cluster_validation(fund_data, window_size, step_size, num_clusters):
+    num_samples = fund_data.shape[0]
+    num_points = fund_data.shape[1]
     num_windows = (num_points - window_size) // step_size + 1
     cluster_labels_over_time = []
 
     for i in range(num_windows):
         start_idx = i * step_size
         end_idx = start_idx + window_size
-        window_data = stock_data[:, start_idx:end_idx]
+        window_data = fund_data[:, start_idx:end_idx]
 
         if window_data.shape[1] < window_size:
             continue  # Skip windows that do not have enough data
@@ -251,15 +232,15 @@ def temporal_cluster_validation(stock_data, window_size, step_size, num_clusters
 
         cluster_labels_over_time.append(clusters)
 
-    return np.array(cluster_labels_over_time).T  # Transpose to make rows correspond to stocks
+    return np.array(cluster_labels_over_time).T  # Transpose to make rows correspond to mutual funds
 
 # Set parameters for the temporal validation
-num_clusters = 3  
+num_clusters = 3
 window_size = 26  # Using half-yearly data as the window size
 step_size = 13    # Overlap of half a year
 
 # Calculate cluster labels over time
-cluster_labels_matrix = temporal_cluster_validation(stock_returns, window_size, step_size, num_clusters)
+cluster_labels_matrix = temporal_cluster_validation(fund_returns, window_size, step_size, num_clusters)
 
 # Plotting and analysis functions
 def compute_temporal_ari(cluster_labels_matrix):
@@ -282,32 +263,6 @@ plt.ylabel('Adjusted Rand Index')
 plt.grid(True)
 plt.show()
 
-def compute_temporal_jaccard(cluster_labels_matrix):
-    num_windows = cluster_labels_matrix.shape[1]
-    jaccard_scores = []
-
-    for i in range(num_windows - 1):
-        jaccard = jaccard_score(cluster_labels_matrix[:, i], cluster_labels_matrix[:, i + 1], average='macro')
-        jaccard_scores.append(jaccard)
-
-    return jaccard_scores
-
-jaccard_scores = compute_temporal_jaccard(cluster_labels_matrix)
-
-plt.figure(figsize=(10, 6))
-plt.plot(range(len(jaccard_scores)), jaccard_scores, linestyle='-')
-plt.title('Jaccard Index Over Time', fontsize=22)
-plt.xlabel('Time Window Index')
-plt.ylabel('Jaccard Index')
-plt.grid(True)
-plt.show()
-
-plt.figure(figsize=(12, 8))
-sns.heatmap(cluster_labels_matrix, annot=False, cmap='viridis', cbar_kws={'label': 'Cluster Label'})
-plt.title('Cluster Assignments Over Time Windows', fontsize=22)
-plt.xlabel('Time Window Index')
-plt.ylabel('Stock Index')
-plt.show()
 
 
 
@@ -329,7 +284,7 @@ def compute_temporal_ari(cluster_labels_matrix):
 # Calculate the ARI scores over time
 ari_scores = compute_temporal_ari(cluster_labels_matrix)
 
-# Compute the average ARI 
+# Compute the average ARI
 if ari_scores:
     average_ari = sum(ari_scores) / len(ari_scores)
     print("Average Adjusted Rand Index (ARI):", average_ari)
@@ -343,13 +298,13 @@ else:
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-num_windows = cluster_labels_matrix.shape[1]  
-fig, ax = plt.subplots(1, 2, figsize=(12, 6))  
+num_windows = cluster_labels_matrix.shape[1]
+fig, ax = plt.subplots(1, 2, figsize=(12, 6))
 
 sns.heatmap(cluster_labels_matrix, annot=False, cmap='Blues', cbar_kws={'label': 'Cluster Number'}, ax=ax[0])
 ax[0].set_title('Cluster Assignments Over Time Windows')
 ax[0].set_xlabel('Time Window Index')
-ax[0].set_ylabel('Stock Index')
+ax[0].set_ylabel('Fund Index')
 
 ax[1].plot(range(1, len(ari_scores) + 1), ari_scores, linestyle='-', marker='o')
 ax[1].set_title('Adjusted Rand Index Over Time')
@@ -389,8 +344,8 @@ plt.axis('equal')
 plt.show()
 
 for cluster_num in sorted(clusters_df['Cluster'].unique()):
-    cluster_stocks = clusters_df[clusters_df['Cluster'] == cluster_num]['Symbol'].tolist()
-    print(f"Cluster {cluster_num}: {', '.join(cluster_stocks)}")
+    cluster_funds = clusters_df[clusters_df['Cluster'] == cluster_num]['Symbol'].tolist()
+    print(f"Cluster {cluster_num}: {', '.join(cluster_funds)}")
 
 
 
@@ -400,12 +355,12 @@ min_cluster_size = 2
 cluster_sizes = clusters_df['Cluster'].value_counts()
 outlier_clusters = cluster_sizes[cluster_sizes < min_cluster_size].index
 
-outlier_stocks = []
+outlier_funds = []
 for cluster in outlier_clusters:
-    stocks_in_cluster = clusters_df[clusters_df['Cluster'] == cluster]['Symbol'].tolist()
-    outlier_stocks.extend(stocks_in_cluster)
+    funds_in_cluster = clusters_df[clusters_df['Cluster'] == cluster]['Symbol'].tolist()
+    outlier_funds.extend(funds_in_cluster)
 
-outlier_indices = np.array([symbols.index(stock) for stock in outlier_stocks]).astype(int)
+outlier_indices = np.array([symbols.index(fund) for fund in outlier_funds]).astype(int)
 
 
 filtered_distance_matrix = np.delete(dtw_distance_matrix, outlier_indices, axis=0)
@@ -417,10 +372,9 @@ filtered_clusters, _ = pd.factorize(filtered_clusters)
 mds = MDS(n_components=4, dissimilarity='precomputed', random_state=42)
 mds_result_filtered = mds.fit_transform(filtered_distance_matrix)
 
-
-print("Outlier Stocks:")
-for stock in outlier_stocks:
-    print(stock)
+print("Outlier Funds:")
+for fund in outlier_funds:
+    print(fund)
 
 
 #identify mutual funds that are from the same company
@@ -452,7 +406,7 @@ filtered_company_mapping = {
 }
 
 
-filtered_clusters_df = clusters_df[~clusters_df['Symbol'].isin(outlier_stocks)]
+filtered_clusters_df = clusters_df[~clusters_df['Symbol'].isin(outlier_funds)]
 
 company_df = pd.DataFrame(list(filtered_company_mapping.items()), columns=['Symbol', 'Company'])
 merged_df_filtered = pd.merge(filtered_clusters_df, company_df, on='Symbol')
@@ -462,7 +416,7 @@ sector_composition_filtered = merged_df_filtered.groupby(['Cluster', 'Company'])
 sector_composition_filtered.plot(kind='bar', stacked=True, figsize=(14, 7), colormap='viridis')
 plt.title('Company Composition within Clusters (Excluding Outliers)')
 plt.xlabel('Cluster')
-plt.ylabel('Number of Stocks')
+plt.ylabel('Number of Funds')
 plt.legend(title='Sector', bbox_to_anchor=(1.05, 1), loc='upper left')
 plt.tight_layout()
 plt.show()
@@ -473,8 +427,7 @@ cluster_sector_percentages = cluster_company_counts.div(cluster_company_counts.s
 print(cluster_sector_percentages)
 
 
-import matplotlib.pyplot as plt
-import seaborn as sns
+
 
 # Assuming cluster_sector_percentages is defined as previously
 plt.figure(figsize=(20, 10))  # Increase the width of the figure to give more room
@@ -489,7 +442,7 @@ plt.show()
 
 
 
-filtered_symbols = [symbol for symbol in symbols if symbol not in outlier_stocks]
+filtered_symbols = [symbol for symbol in symbols if symbol not in outlier_funds]
 filtered_clusters_df = clusters_df[clusters_df['Symbol'].isin(filtered_symbols)].copy()
 
 
@@ -564,24 +517,3 @@ purity = cluster_purity(filtered_clusters, filtered_symbols, company_mapping)
 print(f"Cluster Purity: {purity}")
 
 
-import matplotlib.pyplot as plt
-import numpy as np
-
-company_counts = merged_df_filtered.groupby(['Cluster', 'Company']).size().unstack(fill_value=0)
-cluster_totals = company_counts.sum(axis=1)
-company_percentage = company_counts.div(cluster_totals, axis=0) * 100
-
-# Plot
-plt.figure(figsize=(14, 8))  # Increase figure size for better visibility in thesis
-ax = company_percentage.plot(kind='bar', stacked=True, colormap='viridis', figsize=(14, 8))
-ax.set_title('Cluster Composition by Company - [K-Medoids - DTW]', fontsize=22)
-ax.set_xlabel('Cluster', fontsize=18)
-ax.set_ylabel('Percentage of Companies', fontsize=18)
-ax.legend(title='Company', bbox_to_anchor=(1.05, 1), loc='upper left')
-
-# Improve layout and font sizes for readability
-plt.xticks(rotation=0, fontsize=14)  # Rotate x-labels for better readability
-plt.yticks(fontsize=14)
-plt.tight_layout()  # Adjust layout to make room for legend
-
-plt.show()
