@@ -571,26 +571,6 @@ print(f"Cluster Purity: {purity}")
 
 
 
-import matplotlib.pyplot as plt
-import numpy as np
-
-company_counts = merged_df_filtered.groupby(['Cluster', 'Company']).size().unstack(fill_value=0)
-cluster_totals = company_counts.sum(axis=1)
-company_percentage = company_counts.div(cluster_totals, axis=0) * 100
-
-plt.figure(figsize=(14, 8))
-ax = company_percentage.plot(kind='bar', stacked=True, colormap='viridis', figsize=(14, 8))
-ax.set_title('Cluster Composition by Company - [K-Medoids - Euclidean]', fontsize=22)
-ax.set_xlabel('Cluster', fontsize=18)
-ax.set_ylabel('Percentage of Companies', fontsize=18)
-ax.legend(title='Company', bbox_to_anchor=(1.05, 1), loc='upper left')
-
-plt.xticks(rotation=0, fontsize=14)
-plt.yticks(fontsize=14)
-plt.tight_layout()
-
-plt.show()
-
 
 
 
