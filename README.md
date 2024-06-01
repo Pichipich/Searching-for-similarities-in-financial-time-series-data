@@ -11,14 +11,14 @@ The project utilizes the following clustering algorithms and distance metrics:
 
 + **Clustering Algorithms:**
 
-K-Medoids,
-Hierarchical Clustering
+     K-Medoids,
+     Hierarchical Clustering
 
-**Distance Metrics:**
++ **Distance Metrics:**
 
-Dynamic Time Warping (DTW)
-,Kendall's Tau
-,Euclidean Distance
+     Dynamic Time Warping (DTW)
+     ,Kendall's Tau
+     ,Euclidean Distance
 
 **Data**
 
