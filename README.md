@@ -41,7 +41,7 @@ Normalize and scale the data.
 Calculate returns for mutual funds.
 
 
-**Clustering:***
+**Clustering:**
 
 1. Compute distance matrices using DTW, Kendall's Tau, and Euclidean distance.
 
@@ -70,11 +70,11 @@ For mutual funds, we examine whether funds that tend to be clustered together, a
 
 3. **Intra cluster metrics**
 
-**Correlation:** We calculate the average correlation of returns within each cluster to understand intra-cluster similarity.
+      **Correlation:** We calculate the average correlation of returns within each cluster to understand intra-cluster similarity.
 
-**Volatility:** We measure the average volatility within clusters to identify the risk profiles of clustered assets.
+      **Volatility:** We measure the average volatility within clusters to identify the risk profiles of clustered assets.
 
-**Trends:** We analyze the average trends within clusters using linear regression to determine common movement patterns.
+      **Trends:** We analyze the average trends within clusters using linear regression to determine common movement patterns.
 
 
 
