@@ -1,5 +1,3 @@
-
-
 from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,8 +9,9 @@ from sklearn.manifold import MDS
 from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
 from scipy.stats import linregress
 from scipy.spatial.distance import euclidean, squareform
-import matplotlib.pyplot as plt
-
+from collections import defaultdict, Counter
+import seaborn as sns
+from scipy.cluster.hierarchy import fcluster
 
 symbols = [
     "WWWFX", "KINCX", "KINAX", "KMKNX", "KMKCX", "KMKAX", "KMKYX", "KNPAX", "KNPYX", "KNPCX",
@@ -27,8 +26,6 @@ symbols = [
     "UBVRX", "UBVTX", "UBVUX", "UBVSX", "DHTAX", "UBVLX", "UBVCX",  "MBXCX", "DHTYX","HWSCX",
     "HWSIX", "EIPIX", "HWSAX"
 ]
-
-
 
 conn = sqlite3.connect('mutual_small_data.db')
 
@@ -72,7 +69,7 @@ equal_length_data = np.array([dfs[symbol]['Return'].iloc[:max_length].values for
 distance_matrix = np.zeros((num_symbols, num_symbols))
 
 from scipy.spatial.distance import euclidean
-
+#calculate euclidean matrix
 for i in range(len(symbols)):
     for j in range(i + 1, len(symbols)):
         symbol_i = symbols[i]
@@ -104,9 +101,6 @@ reduced_data_with_clusters_dms = pd.DataFrame(reduced_data_dms, columns=['MDS1',
 
 
 #scores before outlier detection
-
-from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
-import numpy as np
 
 silhouette_scores_original = []
 calinski_harabasz_scores_original = []
@@ -217,12 +211,8 @@ for cluster_num in sorted(clusters_df['Cluster'].unique()):
 
 
 
-import matplotlib.pyplot as plt
-import numpy as np
-from sklearn.manifold import MDS
-from scipy.cluster.hierarchy import fcluster
 
-
+#Plot MDS scatterplot
 mds = MDS(n_components=2, dissimilarity='precomputed', random_state=42)
 mds_result = mds.fit_transform(distance_matrix)
 
@@ -236,23 +226,22 @@ colors = [
 from matplotlib.colors import ListedColormap
 custom_cmap = ListedColormap(colors[:chosen_k])
 
-plt.figure(figsize=(8, 6))  # Use equal width and height for a square plot
+plt.figure(figsize=(8, 6))  
 scatter = plt.scatter(mds_result[:, 0], mds_result[:, 1], c=clusters, cmap=custom_cmap, edgecolor='none', s=50)
 plt.xlabel('MDS Dimension 1', fontsize=14)
 plt.ylabel('MDS Dimension 2', fontsize=14)
 plt.title('MDS Clustering Results [Hierarchical with Euclidean]', fontsize=16)
 plt.grid(True)
-plt.axis('equal')  # Set equal scaling by changing axis limits to equal ranges
+plt.axis('equal')  
 plt.show()
 
 
-import seaborn as sns
 
-# Distance matrix and clustering
+# Distance matrix and clustering between subsequences 
 processed_symbols = list(dfs.keys())
 stock_data = np.array([dfs[symbol].values.flatten() for symbol in processed_symbols])
-num_clusters = 9  # Set based on earlier analysis
-window_size = 26  # half-yearly data
+num_clusters = 9  
+window_size = 26  # half yearly data
 step_size = 13   # overlap of half a year
 
 def compute_distance_matrix(data):
@@ -326,72 +315,23 @@ plt.grid(True)
 plt.show()
 
 
-from sklearn.metrics import jaccard_score
-
-def compute_temporal_jaccard(cluster_labels_matrix):
-    num_windows = cluster_labels_matrix.shape[1]
-    jaccard_scores = []
-
-    for i in range(num_windows - 1):
-        current_labels = cluster_labels_matrix[:, i]
-        next_labels = cluster_labels_matrix[:, i + 1]
-        jaccard = jaccard_score(current_labels, next_labels, average='macro')  # or 'weighted', 'micro'
-        jaccard_scores.append(jaccard)
-
-    return jaccard_scores
-
-# Compute Jaccard Index over time
-jaccard_scores = compute_temporal_jaccard(cluster_labels_matrix)
-
-# Plot Jaccard Index over time
-plt.figure(figsize=(10, 6))
-plt.plot(range(len(jaccard_scores)), jaccard_scores, linestyle='-')
-plt.title('Jaccard Index Over Time',fontsize=22)
-plt.xlabel('Time Window Index')
-plt.ylabel('Jaccard Index')
-plt.grid(True)
-plt.show()
-
-
-
-
-
-import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
 
 # Assuming 'cluster_labels_matrix' holds the cluster labels for each stock over time.
 num_windows = cluster_labels_matrix.shape[1]
 window_labels = [f'Time Window {i+1}' for i in range(num_windows)]
-
-# Set an appropriate figure size
 plt.figure(figsize=(16, 14))
 
 # Create the heatmap without annotations
 ax = sns.heatmap(cluster_labels_matrix, cmap='Blues', cbar_kws={'label': 'Cluster Number'})
-
-# Adjust font sizes for labels and title using suptitle for better control
 plt.suptitle('Cluster Evolution Over Time [Hierarchical - Euclidean]', fontsize=35, va='top', ha='center', x=0.5, y=0.95)
-
-# Set labels with adjusted font sizes
 ax.set_xlabel('Time Interval', fontsize=18)
 ax.set_ylabel('Stock Index', fontsize=18)
-
-# Set and rotate x-axis labels for better visibility
-ax.set_xticklabels(window_labels, rotation=45, ha="right", fontsize=14)  # Adjust x-axis tick label size and orientation
-
-# Adjust y-axis label sizes
+ax.set_xticklabels(window_labels, rotation=45, ha="right", fontsize=14)  
 ax.tick_params(axis='y', labelsize=14)
-
-# Adjust color bar label size
 cbar = ax.collections[0].colorbar
-cbar.ax.set_ylabel('Cluster Number', fontsize=18)  # Set and adjust font size of the color bar's label
-cbar.ax.tick_params(labelsize=16)  # Adjust color bar tick label size
-
-# Use tight layout to automatically adjust subplot params
-plt.tight_layout(rect=[0, 0, 1, 0.95])  # Adjust the rect to leave space for the title
-
-# Show the plot
+cbar.ax.set_ylabel('Cluster Number', fontsize=18)  
+cbar.ax.tick_params(labelsize=16)  
+plt.tight_layout(rect=[0, 0, 1, 0.95]) 
 plt.show()
 
 
@@ -426,15 +366,10 @@ else:
     print("No ARI scores available to average.")
 
 
-
-
-
-import matplotlib.pyplot as plt
-import seaborn as sns
-
+#plot heatmap of clusters over time windows
 num_windows = cluster_labels_matrix.shape[1]  # Number of time windows
 
-fig, ax = plt.subplots(1, 2, figsize=(12, 6))  # Adjust the figsize to fit the aspect ratio and size you desire
+fig, ax = plt.subplots(1, 2, figsize=(12, 6))  
 
 sns.heatmap(cluster_labels_matrix, annot=False, cmap='Blues', cbar_kws={'label': 'Cluster Number'}, ax=ax[0])
 ax[0].set_title('Cluster Assignments Over Time Windows')
@@ -453,15 +388,7 @@ plt.show()
 
 
 
-
-
-
-
-
-
-
-#OUTLIERS
-
+#exclusion of outliers
 min_cluster_size =2
 cluster_sizes = clusters_df['Cluster'].value_counts()
 outlier_clusters = cluster_sizes[cluster_sizes < min_cluster_size].index
@@ -472,7 +399,6 @@ for cluster in outlier_clusters:
     outlier_stocks.extend(stocks_in_cluster)
 
 outlier_indices = np.array([symbols.index(stock) for stock in outlier_stocks]).astype(int)
-
 
 filtered_distance_matrix = np.delete(distance_matrix, outlier_indices, axis=0)
 filtered_distance_matrix = np.delete(filtered_distance_matrix, outlier_indices, axis=1)
@@ -575,8 +501,7 @@ for cluster_num in filtered_clusters_df['Cluster'].unique():
 
 
 
-#calculate to unscaled data
-
+#calculate intracluster metrics to unscaled data
 from scipy.stats import linregress
 
 cluster_volatility_filtered = {}
@@ -599,11 +524,6 @@ print('Intra-cluster Correlation (Filtered):', intra_cluster_corr_filtered)
 print('Cluster Volatility (Filtered):', cluster_volatility_filtered)
 print('Cluster Trends (Filtered):', cluster_trends_filtered)
 
-
-
-
-
-from collections import defaultdict, Counter
 
 # Extract the filtered symbols and their corresponding cluster labels.
 filtered_symbols = filtered_clusters_df['Symbol'].tolist()
@@ -635,23 +555,4 @@ print(f"Cluster Purity: {purity}")
 
 
 
-import matplotlib.pyplot as plt
-import numpy as np
-
-company_counts = merged_df_filtered.groupby(['Cluster', 'Company']).size().unstack(fill_value=0)
-cluster_totals = company_counts.sum(axis=1)
-company_percentage = company_counts.div(cluster_totals, axis=0) * 100
-
-plt.figure(figsize=(14, 8))
-ax = company_percentage.plot(kind='bar', stacked=True, colormap='viridis', figsize=(14, 8))
-ax.set_title('Cluster Composition by Company - [K-Medoids - Euclidean]', fontsize=22)
-ax.set_xlabel('Cluster', fontsize=18)
-ax.set_ylabel('Percentage of Companies', fontsize=18)
-ax.legend(title='Company', bbox_to_anchor=(1.05, 1), loc='upper left')
-
-plt.xticks(rotation=0, fontsize=14)
-plt.yticks(fontsize=14)
-plt.tight_layout()
-
-plt.show()
 
