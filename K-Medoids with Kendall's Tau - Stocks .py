@@ -257,7 +257,7 @@ def temporal_cluster_validation(stock_data, window_size, step_size, num_clusters
         cluster_labels = kmedoids.fit_predict(window_distance_matrix)
         cluster_labels_over_time.append(cluster_labels)
 
-    return np.array(cluster_labels_over_time).T  # Transpose to make rows correspond to stocks
+    return np.array(cluster_labels_over_time).T  
 
 # Visualize the temporal stability of clusters
 cluster_labels_matrix = temporal_cluster_validation(stock_data, window_size, step_size, num_clusters)
@@ -366,7 +366,6 @@ plt.tight_layout()  # Adjust layout to make room for labels if necessary
 plt.show()
 
 
-from sklearn_extra.cluster import KMedoids
 #calculate average ARI
 def temporal_cluster_validation(stock_data, window_size, step_size, num_clusters):
     num_windows = (stock_data.shape[1] - window_size) // step_size + 1
@@ -444,13 +443,13 @@ colors = [
 from matplotlib.colors import ListedColormap
 custom_cmap = ListedColormap(colors[:chosen_k])
 
-plt.figure(figsize=(8, 6))  # Use equal width and height for a square plot
+plt.figure(figsize=(8, 6))
 scatter = plt.scatter(mds_result[:, 0], mds_result[:, 1], c=clusters, cmap=custom_cmap, edgecolor='none', s=50)
 plt.xlabel('MDS Dimension 1', fontsize=14)
 plt.ylabel('MDS Dimension 2', fontsize=14)
 plt.title('MDS Clustering Results [K-Medoids with Kendall\'s Tau]', fontsize=16)
 plt.grid(True)
-plt.axis('equal')  # Set equal scaling by changing axis limits to equal ranges
+plt.axis('equal')  
 plt.show()
 
 
