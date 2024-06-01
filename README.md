@@ -36,8 +36,8 @@ The implementation is done in Python, using libraries such as scipy, numpy, pand
 **Clustering:**
 1. Compute distance matrices using DTW, Kendall's Tau, and Euclidean distance.
 2. Apply K-Medoids and Hierarchical clustering algorithms.
-3. Determine the optimal number of clusters using evaluation metrics and the Elbow method.
-4. Visualize clustering results using dendrograms and Multidimensional Scaling (MDS) plots.
+3. Determine the optimal number of clusters using evaluation metrics and the Elbow / dendrogram methods.
+4. Visualize clustering results using Multidimensional Scaling (MDS) plots.
 
 **Evaluation:**
 The evaluation metrics used include Silhouette Score, Calinski-Harabasz Index, and Davies-Bouldin Index to find the optimal number of clusters and evaluate clustering performance.
