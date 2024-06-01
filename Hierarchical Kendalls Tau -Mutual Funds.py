@@ -204,10 +204,6 @@ num_clusters = 11  # number of clusters chosen
 window_size = 26  # half-yearly data
 step_size = 13   # overlap of half a year
 
-from tslearn.metrics import dtw
-
-import numpy as np
-from scipy.stats import kendalltau
 
 def compute_distance_matrix(data):
     num_samples = data.shape[0]
