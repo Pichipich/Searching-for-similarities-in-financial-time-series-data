@@ -140,12 +140,8 @@ optimal_clusters_hierarchical_davies_bouldin = np.argmin(davies_bouldin_scores_o
 print(f"Optimal Number of Clusters (Davies-Bouldin): {optimal_clusters_hierarchical_davies_bouldin}")
 
 
-#Evaluation scores 
-
-# Chosen number of clusters after evaluation
+# Evaluation scores for chosen number of clusters
 chosen_k = 9
-
-# Generating the clusters based on the chosen k
 clusters = fcluster(linkage_matrix, chosen_k, criterion='maxclust')
 
 # Calculating the evaluation scores for the chosen k
