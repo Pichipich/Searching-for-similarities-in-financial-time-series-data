@@ -12,6 +12,7 @@ Clustering Algorithms:
 
 K-Medoids
 Hierarchical Clustering
+
 Distance Metrics:
 
 Dynamic Time Warping (DTW)
