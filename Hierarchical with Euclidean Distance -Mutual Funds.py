@@ -141,7 +141,8 @@ optimal_clusters_hierarchical_davies_bouldin = np.argmin(davies_bouldin_scores_o
 print(f"Optimal Number of Clusters (Davies-Bouldin): {optimal_clusters_hierarchical_davies_bouldin}")
 
 
-#EVALUATION SCORES
+#Evaluation scores 
+
 # Chosen number of clusters after evaluation
 chosen_k = 9
 
@@ -157,8 +158,6 @@ davies_bouldin_avg = davies_bouldin_score(reduced_data_dms, clusters)
 print(f"Silhouette Score: {silhouette_avg}")
 print(f"Calinski-Harabasz Score: {calinski_harabasz_avg}")
 print(f"Davies-Bouldin Score: {davies_bouldin_avg}")
-
-# Assume silhouette_scores_original, calinski_harabasz_scores_original, and davies_bouldin_scores_original contain the scores from 2 to 40 clusters as calculated previously
 
 # Normalize scores for the chosen k
 def normalize_score(score, scores_list):
@@ -187,17 +186,6 @@ plt.show()
 clusters = fcluster(linkage_matrix, chosen_k, criterion='maxclust')
 clusters_df = pd.DataFrame({'Symbol': symbols, 'Cluster': clusters})
 
-mds = MDS(n_components=2, dissimilarity='precomputed')
-mds_result = mds.fit_transform(distance_matrix)
-
-plt.scatter(mds_result[:, 0], mds_result[:, 1], c=clusters, cmap='viridis')
-plt.xlabel('MDS Dimension 1')
-plt.ylabel('MDS Dimension 2')
-plt.title('MDS Clustering Results [Hierarchical with DTW]')
-plt.show()
-
-
-
 end_time = time.time()
 elapsed_time = end_time - start_time
 print(f"Elapsed Time: {elapsed_time} seconds")
@@ -207,9 +195,6 @@ print(f"Elapsed Time: {elapsed_time} seconds")
 for cluster_num in sorted(clusters_df['Cluster'].unique()):
     cluster_stocks = clusters_df[clusters_df['Cluster'] == cluster_num]['Symbol'].tolist()
     print(f"Cluster {cluster_num}: {', '.join(cluster_stocks)}")
-
-
-
 
 
 #Plot MDS scatterplot
@@ -277,19 +262,18 @@ def temporal_cluster_validation(stock_data, window_size, step_size, num_clusters
 
         cluster_labels_over_time.append(clusters)
 
-    return np.array(cluster_labels_over_time).T  # Transpose to make rows correspond to stocks
+    return np.array(cluster_labels_over_time).T  
 
 # Prepare the return data for temporal clustering
 processed_symbols = list(dfs.keys())
-stock_returns = np.array([dfs[symbol]['Return'].dropna().values for symbol in processed_symbols if 'Return' in dfs[symbol].columns])
+fund_returns = np.array([dfs[symbol]['Return'].dropna().values for symbol in processed_symbols if 'Return' in dfs[symbol].columns])
 
 # Calculate cluster labels over time
-cluster_labels_matrix = temporal_cluster_validation(stock_returns, window_size=26, step_size=13, num_clusters=35)
-
+cluster_labels_matrix = temporal_cluster_validation(fund_returns, window_size=26, step_size=13, num_clusters=35)
 
 
 from sklearn.metrics import adjusted_rand_score
-
+#function to compute ARI over time
 def compute_temporal_ari(cluster_labels_matrix):
     num_windows = cluster_labels_matrix.shape[1]
     ari_scores = []
@@ -315,7 +299,6 @@ plt.grid(True)
 plt.show()
 
 
-
 # Assuming 'cluster_labels_matrix' holds the cluster labels for each stock over time.
 num_windows = cluster_labels_matrix.shape[1]
 window_labels = [f'Time Window {i+1}' for i in range(num_windows)]
@@ -335,14 +318,8 @@ plt.tight_layout(rect=[0, 0, 1, 0.95])
 plt.show()
 
 
-
-
-
-
-
-
 from sklearn.metrics import adjusted_rand_score
-
+#compute average ARI
 def compute_temporal_ari(cluster_labels_matrix):
     num_windows = cluster_labels_matrix.shape[1]
     ari_scores = []
