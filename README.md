@@ -62,4 +62,4 @@ In addition to clustering based on financial performance, this project also expl
 - Elbow Method: Used to identify the point where the rate of decrease in the distortion slows down, indicating the optimal number of clusters.
 - MDS Plots: Used to visualize the distance matrix in a lower-dimensional space to better understand the clustering results.
 
-This README file provides a comprehensive overview of the project, its methods, implementation, and usage instructions. It serves as a guide for anyone interested in replicating or extending the analysis.
+
