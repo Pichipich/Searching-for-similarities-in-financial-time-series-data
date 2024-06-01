@@ -9,7 +9,7 @@ with the goal of determining how well different clustering methods and distance 
 
 The project utilizes the following clustering algorithms and distance metrics:
 
-**Clustering Algorithms:**
++ **Clustering Algorithms:**
 
 K-Medoids,
 Hierarchical Clustering
