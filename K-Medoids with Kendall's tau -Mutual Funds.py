@@ -199,24 +199,6 @@ print(f"Normalized Silhouette Score: {normalized_silhouette}")
 print(f"Normalized Calinski-Harabasz Score: {normalized_calinski}")
 print(f"Normalized (Inverted) Davies-Bouldin Score: {normalized_davies_bouldin}")
 
-# Visualization for evaluation
-plt.figure(figsize=(10, 6))
-plt.bar(['Silhouette', 'Calinski-Harabasz', 'Davies-Bouldin'],
-        [normalized_silhouette, normalized_calinski, normalized_davies_bouldin],
-        color=['red', 'blue', 'green'])
-plt.ylabel('Normalized Metric Score')
-plt.title('Normalized Clustering Evaluation Metrics')
-plt.show()
-
-
-
-
-
-
-
-
-
-
 
 
 num_clusters = 38
@@ -316,32 +298,6 @@ plt.ylabel('Adjusted Rand Index')
 plt.grid(True)
 plt.show()
 
-def compute_temporal_jaccard(cluster_labels_matrix):
-    num_windows = cluster_labels_matrix.shape[1]
-    jaccard_scores = []
-
-    for i in range(num_windows - 1):
-        jaccard = jaccard_score(cluster_labels_matrix[:, i], cluster_labels_matrix[:, i + 1], average='macro')
-        jaccard_scores.append(jaccard)
-
-    return jaccard_scores
-
-jaccard_scores = compute_temporal_jaccard(cluster_labels_matrix)
-
-plt.figure(figsize=(10, 6))
-plt.plot(range(len(jaccard_scores)), jaccard_scores, linestyle='-')
-plt.title('Jaccard Index Over Time', fontsize=22)
-plt.xlabel('Time Window Index')
-plt.ylabel('Jaccard Index')
-plt.grid(True)
-plt.show()
-
-plt.figure(figsize=(12, 8))
-sns.heatmap(cluster_labels_matrix, annot=False, cmap='viridis', cbar_kws={'label': 'Cluster Label'})
-plt.title('Cluster Assignments Over Time Windows', fontsize=22)
-plt.xlabel('Time Window Index')
-plt.ylabel('Fund Index')
-plt.show()
 
 
 
