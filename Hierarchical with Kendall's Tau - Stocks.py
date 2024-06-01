@@ -1,6 +1,3 @@
-
-
-
 from scipy.stats import kendalltau
 from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
 import matplotlib.pyplot as plt
@@ -12,7 +9,7 @@ from scipy.spatial.distance import squareform
 from sklearn.manifold import MDS
 from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
 from scipy.stats import linregress, zscore
-
+import seaborn as sns
 
 symbols = ['AMAT', 'JPM', 'NVDA', 'GE', 'HD', 'INTC', 'QCOM', 'HON', 'WFC',
            'AAPL', 'MSFT', 'TXN', 'GOOG', 'USB', 'GOOGL', 'GILD', 'AMZN', 'PEP',
@@ -213,10 +210,10 @@ plt.show()
 
 import seaborn as sns
 
-# Distance matrix and clustering
+# Evaluation over time windows
 processed_symbols = list(dfs.keys())
 stock_data = np.array([dfs[symbol].values.flatten() for symbol in processed_symbols])
-num_clusters = 6  # Set based on earlier analysis
+num_clusters = 6  
 window_size = 104  # half-yearly data
 step_size = 52   # overlap of half a year
 
@@ -288,37 +285,6 @@ plt.show()
 
 
 
-from sklearn.metrics import jaccard_score
-
-def compute_temporal_jaccard(cluster_labels_matrix):
-    num_windows = cluster_labels_matrix.shape[1]
-    jaccard_scores = []
-
-    for i in range(num_windows - 1):
-        current_labels = cluster_labels_matrix[:, i]
-        next_labels = cluster_labels_matrix[:, i + 1]
-        jaccard = jaccard_score(current_labels, next_labels, average='macro')  # or 'weighted', 'micro'
-        jaccard_scores.append(jaccard)
-
-    return jaccard_scores
-
-# Compute Jaccard Index over time
-jaccard_scores = compute_temporal_jaccard(cluster_labels_matrix)
-
-# Plot Jaccard Index over time
-plt.figure(figsize=(10, 6))
-plt.plot(range(len(jaccard_scores)), jaccard_scores, linestyle='-')
-plt.title('Jaccard Index Over Time',fontsize=22)
-plt.xlabel('Time Window Index')
-plt.ylabel('Jaccard Index')
-plt.grid(True)
-plt.show()
-
-
-
-import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
 
 # Assuming 'cluster_labels_matrix' holds the cluster labels for each stock over time.
 num_windows = cluster_labels_matrix.shape[1]
@@ -335,7 +301,7 @@ plt.tight_layout()  # Adjust layout to make room for labels if necessary
 
 plt.show()
 
-
+#Compute average ARI scores
 def temporal_cluster_validation(stock_data, window_size, step_size, num_clusters):
     num_windows = (stock_data.shape[1] - window_size) // step_size + 1
     cluster_labels_over_time = []
