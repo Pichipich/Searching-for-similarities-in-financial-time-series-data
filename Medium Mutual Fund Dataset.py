@@ -49,12 +49,12 @@ for symbol in symbols:
     # Check if the DataFrame has the desired number of rows
     if len(df) != desired_row_count:
         print(f"{symbol} does not have exactly {desired_row_count} rows, it has {len(df)} rows. Skipping.")
-        continue  # Skip this iteration and don't download or write to the database
+        continue  
 
     # If the check passes, proceed with data manipulation
-    df['Symbol'] = symbol  # Add the 'Symbol' column to the DataFrame
-    df['Date'] = df.index  # Add a column with the dates
-    df.set_index('Date', inplace=True)  # Set 'Date' as the index
+    df['Symbol'] = symbol  
+    df['Date'] = df.index  
+    df.set_index('Date', inplace=True)  
 
     # Write the DataFrame to SQLite database
     df.to_sql(symbol, conn, index=True, if_exists='replace')
